@@ -1,4 +1,4 @@
-package task0;
+package main.java.task0;
 
 import java.util.List;
 
