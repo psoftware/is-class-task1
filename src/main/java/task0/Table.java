@@ -46,16 +46,14 @@ public class Table  extends TableView {
         TableColumn id = new TableColumn("ID");
         TableColumn name = new TableColumn("Name");
         TableColumn cfu = new TableColumn("CFU");
-        TableColumn professor = new TableColumn("Professor");
         id.setCellValueFactory(new PropertyValueFactory("id"));
         name.setCellValueFactory(new PropertyValueFactory("name"));
         cfu.setCellValueFactory(new PropertyValueFactory("cfu"));
-        professor.setCellValueFactory(new PropertyValueFactory("professor"));
         
         listaOsservabile = FXCollections.observableArrayList();
         setItems(listaOsservabile);
         getColumns().clear();
-        getColumns().addAll(id, name, cfu, professor);
+        getColumns().addAll(id, name, cfu);
     }
     
      public void setTableExamResults(){//02
@@ -81,8 +79,7 @@ public class Table  extends TableView {
     
     public void clear(){listaOsservabile.clear();}
     
-    public void setSelectedRow(int i){this.getSelectionModel().select(i);}
-    
-    public int getSelectedRow(){ return this.getSelectionModel().getSelectedIndex();}
+    public Course getSelectedCourse(){ return (Course) this.getSelectionModel().getSelectedItem(); }
+
     
 }

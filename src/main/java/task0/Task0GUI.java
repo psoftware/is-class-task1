@@ -3,11 +3,17 @@ package main.java.task0;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import javafx.event.ActionEvent;
+import java.sql.Date;
+import java.time.ZoneId;
 import java.util.List;
 
 class Task0GUI {
@@ -18,6 +24,7 @@ class Task0GUI {
     private final Form form;
     private final VBox outerVbox;
     private final Table table;
+    private final HBox lowerHbox;
     
     public Task0GUI(){
         larghezzaFinestra = 650;
@@ -30,8 +37,9 @@ class Task0GUI {
         
         form = new Form();
         table = new Table();
+        lowerHbox = new HBox();
         
-        outerVbox = new VBox(title, form.getForm(), table);
+        outerVbox = new VBox(title, form.getForm(), table, lowerHbox);
         outerVbox.setPrefSize(larghezzaFinestra, lunghezzaFinestra);
         outerVbox.setStyle("-fx-background: "+ background);
         outerVbox.setAlignment(Pos.TOP_CENTER);
@@ -71,23 +79,37 @@ class Task0GUI {
                 }
         });
         
-      form.getConfirmButton().pressedProperty().addListener((e) -> {
-          eventConfirm(form.getID(),
-                  form.getRole().getValue().toString(),
-                  form.getAction().getValue().toString());
+      form.getConfirmButton().setOnAction((ActionEvent ev) -> {
+              System.out.println("wasPressedConfirm");
+              eventConfirm(form.getID(),
+                      form.getRole().getValue().toString(),
+                      form.getAction().getValue().toString());
         });
-    }
-
-    public void updateTable(List list) {
-        table.update(list);
     }
     
     public void eventConfirm(String id, String role, String action){
         if(role.equals("Professor")) {
-            if(action.equals("Add Exam"))
+            if(action.equals("Add Exam")) {
+                System.out.println("Add Exam");
                 User.getInstance().listCourses(this, Integer.parseInt(form.getID()));
-            else if(action.equals("Add Grade"))
+                //update gui, aggiungere bottoni (Datepicker, Conferma)
+                lowerHbox.getChildren().clear();
+                DatePicker examDate = new DatePicker();
+                Button confirmAddButton = new Button("Add Exam");
+                lowerHbox.getChildren().add(examDate);
+                lowerHbox.getChildren().add(confirmAddButton);
+                confirmAddButton.setOnAction((ActionEvent ev) -> {
+                        System.out.println("wasPressed");
+                        Course course = table.getSelectedCourse();
+                        Date date = Date.valueOf(examDate.getValue());
+                        System.out.println(date);
+                        User.getInstance().addExam(course.getId(), date);
+                });
+            }
+            else if (action.equals("Add Grade")) {
                 User.getInstance().listExams(this);
+                //update gui, aggiungere bottoni (Textfield(voto), conferma)
+            }
         } else if(role.equals("Student")) {
             if(action.equals("Register/Deregister to Exam"))
                 ;
@@ -95,6 +117,13 @@ class Task0GUI {
                 ;
         }
     };
+
     public VBox getOuterVbox(){return outerVbox;}
 
+    //gestione delle tabella
+    public void updateTable(List list) {
+        table.update(list);
+    }
+    public void setTableExams() {table.setTableExams();}
+    public void setTableCourses() {table.setTableCourses();}
 }

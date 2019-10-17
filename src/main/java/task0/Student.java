@@ -10,6 +10,5 @@ package main.java.task0;
  * @author adria
  */
 public class Student {
-
-
+    
 }

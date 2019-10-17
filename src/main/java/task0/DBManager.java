@@ -62,7 +62,7 @@ public class DBManager {
     public ArrayList<Course> findCourse (int profID) {
         ArrayList<Course> result = null;
         try {
-            String sql = "SELECT * FROM course WHERE id = ?";
+            String sql = "SELECT * FROM course WHERE professor = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, profID);
             pstmt.execute();
@@ -85,7 +85,7 @@ public class DBManager {
             String sql = "INSERT INTO exam (course, date) VALUES(?, ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, courseID);
-            pstmt.setDate(2, date);
+            pstmt.setDate(2, date); //imposta la data a un giorno precedente
             pstmt.executeUpdate();
         } catch (SQLException ex) {
            System.out.println("SQLException: " + ex.getMessage());
