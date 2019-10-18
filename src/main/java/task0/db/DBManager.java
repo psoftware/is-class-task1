@@ -88,7 +88,7 @@ public class DBManager {
         return result;
     }
     
-    public void insertExam (int courseID, LocalDate date) {
+    public void insertExam (int courseID, LocalDate date) throws TriggerSQLException {
         try {
             String sql = "INSERT INTO exam (course, date) VALUES(?, ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -98,7 +98,8 @@ public class DBManager {
         } catch (SQLException ex) {
            System.out.println("SQLException: " + ex.getMessage());
            System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());           
+           System.out.println("VendorError: " + ex.getErrorCode());
+           TriggerSQLException.ifFromTrigger(ex);
         }
     }
     
@@ -227,7 +228,7 @@ public class DBManager {
         }
 
         public static void ifFromTrigger(SQLException ex) throws TriggerSQLException{
-            if(ex.getErrorCode() == 02000) {
+            if(ex.getSQLState().equals("02000")) {
                 throw new TriggerSQLException(ex.getMessage());
             }
         }

@@ -107,7 +107,11 @@ public class Task0GUI {
                 table.setTableCourses("Add Exam Date",
                         course -> {
                             LocalDate newdate = SimpleDialog.DateDialog.showDialog();
-                            DBManager.getInstance().insertExam(course.getId(), newdate);
+                            try {
+                                DBManager.getInstance().insertExam(course.getId(), newdate);
+                            } catch (DBManager.TriggerSQLException e) {
+                                SimpleDialog.showErrorDialog(e.getMessage());
+                            }
                         });
                 table.update(DBManager.getInstance().findCourse(formId));
             }
