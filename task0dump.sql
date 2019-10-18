@@ -156,4 +156,67 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+-- can't register to an exam after the exam date
+DROP TRIGGER IF EXISTS checkRegistration;
+DELIMITER $$
+CREATE TRIGGER checkRegistration 
+BEFORE INSERT ON exam_result
+       FOR EACH ROW 
+BEGIN
+		IF(current_date() >= NEW.date or 	((SELECT COUNT(*) 
+											FROM exam_result 
+                                            WHERE student = NEW.student 
+												AND course = NEW.course
+												AND grade is not null ) != 0 ) 
+		) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot register to an old or already took exam';
+		END IF;
+END $$
+DELIMITER ;
+
+-- can't add a grade for an exam in the future
+DROP TRIGGER IF EXISTS checkGrade;
+DELIMITER $$
+CREATE TRIGGER checkGrade
+BEFORE UPDATE ON exam_result
+       FOR EACH ROW 
+BEGIN
+		IF(current_date() < NEW.date) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert a mark for an exam in the future';
+        ELSE
+			DELETE 
+            FROM exam_result
+            WHERE student = NEW.student
+				AND course = NEW.course
+                AND date <> NEW.date;
+		END IF;
+END $$
+DELIMITER ;
+
+-- can't add an exam for the current or past date
+DROP TRIGGER IF EXISTS checkExamDate;
+DELIMITER $$
+CREATE TRIGGER checkExamDate 
+BEFORE INSERT ON exam
+       FOR EACH ROW 
+BEGIN
+		IF(current_date() >= NEW.date) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert an exam for  the current or past date';
+		END IF;
+END $$
+DELIMITER ;
+
+-- can't delete a registration for an old exam or an already took one
+DROP TRIGGER IF EXISTS checkDeleteRegistration;
+DELIMITER $$
+CREATE TRIGGER checkDeleteRegistration 
+BEFORE DELETE ON exam_result
+       FOR EACH ROW 
+BEGIN
+		IF(OLD.grade is not null or (OLD.date <= current_date()) ) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot delete an old or already took exam registration';
+		END IF;
+END $$
+DELIMITER ;
+
 -- Dump completed on 2019-10-13 16:52:15
