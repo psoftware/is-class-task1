@@ -34,48 +34,55 @@ public class Table  extends TableView {
        
     }
     
-    public void setTableExams(String actionName, Consumer<Exam> callback){//02
+    public void setTableExams(String actionName, @Nullable Consumer<Exam> callback){//02
+        getColumns().clear();
+
         TableColumn course = new TableColumn("Course");
         TableColumn date = new TableColumn("Date");
-        TableColumn action = new TableColumn("Action");
         course.setCellValueFactory(new PropertyValueFactory("course"));
         date.setCellValueFactory(new PropertyValueFactory("date"));
-        //action.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+        getColumns().addAll(course, date);
 
-        action.setCellFactory(TableCellButton.<Exam>forTableColumn(actionName, (Exam p) -> {
-            //table.getItems().remove(p);
-            callback.accept(p);
-            return p;
-        }));
+        if(callback != null) {
+            TableColumn action = new TableColumn("Action");
+            action.setCellFactory(TableCellButton.<Exam>forTableColumn(actionName, (Exam p) -> {
+                //table.getItems().remove(p);
+                callback.accept(p);
+                return p;
+            }));
+            getColumns().add(action);
+        }
 
         listaOsservabile = FXCollections.observableArrayList();
         setItems(listaOsservabile);
-        getColumns().clear();
-        getColumns().addAll(course, date, action);
     }
     
-    public void setTableCourses(String actionName, Consumer<Course> callback){//02
+    public void setTableCourses(String actionName, @Nullable Consumer<Course> callback){//02
+        getColumns().clear();
+
         TableColumn id = new TableColumn("ID");
         TableColumn name = new TableColumn("Name");
         TableColumn cfu = new TableColumn("CFU");
-        TableColumn action = new TableColumn("Action");
         id.setCellValueFactory(new PropertyValueFactory("id"));
         name.setCellValueFactory(new PropertyValueFactory("name"));
         cfu.setCellValueFactory(new PropertyValueFactory("cfu"));
+        getColumns().addAll(id, name, cfu);
 
-        action.setCellFactory(TableCellButton.<Course>forTableColumn(actionName, (Course p) -> {
-            //table.getItems().remove(p);
-            callback.accept(p);
-            return p;
-        }));
+        if(callback != null) {
+            TableColumn action = new TableColumn("Action");
+            action.setCellFactory(TableCellButton.<Course>forTableColumn(actionName, (Course p) -> {
+                //table.getItems().remove(p);
+                callback.accept(p);
+                return p;
+            }));
+            getColumns().add(action);
+        }
         
         listaOsservabile = FXCollections.observableArrayList();
         setItems(listaOsservabile);
-        getColumns().clear();
-        getColumns().addAll(id, name, cfu, action);
     }
     
-     public void setTableExamResults(String actionName, boolean showStudentId, Consumer<Registration> callback){//02
+     public void setTableExamResults(String actionName, boolean showStudentId, @Nullable Consumer<Registration> callback){//02
          getColumns().clear();
 
         if(showStudentId) {
@@ -83,24 +90,28 @@ public class Table  extends TableView {
             student.setCellValueFactory(new PropertyValueFactory("studentID"));
             getColumns().add(student);
         }
+
         TableColumn course = new TableColumn("Course");
         TableColumn date = new TableColumn("Date");
         TableColumn grade = new TableColumn("Grade");
-        TableColumn action = new TableColumn("Action");
 
         course.setCellValueFactory(new PropertyValueFactory("course"));
         date.setCellValueFactory(new PropertyValueFactory("date"));
         grade.setCellValueFactory(new PropertyValueFactory("grade"));
+        getColumns().addAll(course, date, grade);
 
-        action.setCellFactory(TableCellButton.<Registration>forTableColumn(actionName, (Registration p) -> {
-            //table.getItems().remove(p);
-            callback.accept(p);
-            return p;
-        }));
+        if(callback != null) {
+            TableColumn action = new TableColumn("Action");
+            action.setCellFactory(TableCellButton.<Registration>forTableColumn(actionName, (Registration p) -> {
+                //table.getItems().remove(p);
+                callback.accept(p);
+                return p;
+            }));
+            getColumns().add(action);
+        }
         
         listaOsservabile = FXCollections.observableArrayList();
         setItems(listaOsservabile);
-        getColumns().addAll(course, date, grade, action);
     }
     
     public void update(List lista){

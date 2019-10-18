@@ -136,17 +136,11 @@ public class Task0GUI {
                 table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
             }
             else if(action.equals("See Grades")) {
-                table.setTableExamResults("", false, reg -> {});
+                table.setTableExamResults("", false, null);
                 table.update(DBManager.getInstance().findRegistrationStudent(formId, false));
             }
         }
     };
 
     public VBox getOuterVbox(){return outerVbox;}
-
-    //gestione delle tabella
-    public void setTableExams(List list) {
-        table.setTableExams("Boh", p->{});
-        table.update(list);
-    }
 }
