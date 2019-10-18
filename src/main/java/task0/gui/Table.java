@@ -75,13 +75,19 @@ public class Table  extends TableView {
         getColumns().addAll(id, name, cfu, action);
     }
     
-     public void setTableExamResults(String actionName, Consumer<Registration> callback){//02
-        TableColumn student = new TableColumn("Student");
+     public void setTableExamResults(String actionName, boolean showStudentId, Consumer<Registration> callback){//02
+         getColumns().clear();
+
+        if(showStudentId) {
+            TableColumn student = new TableColumn("Student");
+            student.setCellValueFactory(new PropertyValueFactory("studentID"));
+            getColumns().add(student);
+        }
         TableColumn course = new TableColumn("Course");
         TableColumn date = new TableColumn("Date");
         TableColumn grade = new TableColumn("Grade");
         TableColumn action = new TableColumn("Action");
-        student.setCellValueFactory(new PropertyValueFactory("student"));
+
         course.setCellValueFactory(new PropertyValueFactory("course"));
         date.setCellValueFactory(new PropertyValueFactory("date"));
         grade.setCellValueFactory(new PropertyValueFactory("grade"));
@@ -94,8 +100,7 @@ public class Table  extends TableView {
         
         listaOsservabile = FXCollections.observableArrayList();
         setItems(listaOsservabile);
-        getColumns().clear();
-        getColumns().addAll(student, course, date, grade, action);
+        getColumns().addAll(course, date, grade, action);
     }
     
     public void update(List lista){

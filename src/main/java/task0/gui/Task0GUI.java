@@ -112,7 +112,7 @@ public class Task0GUI {
                 table.update(DBManager.getInstance().findCourse(formId));
             }
             else if (action.equals("Add Grade")) {
-                table.setTableExamResults("Insert Mark",
+                table.setTableExamResults("Insert Mark", true,
                             reg -> {
                                 int mark = SimpleDialog.MarkDialog.showDialog();
                                 DBManager.getInstance().updateRegistration(reg.getStudentID(), reg.getDate(), reg.getCourseID(), mark);
@@ -128,7 +128,7 @@ public class Task0GUI {
                         });
                 table.update(DBManager.getInstance().findExam());
             } else if(action.equals("Deregister to Exam")) {
-                table.setTableExamResults("Deregister",
+                table.setTableExamResults("Deregister", false,
                         reg -> {
                             DBManager.getInstance().deleteRegistration(formId, reg.getCourseID(), reg.getDate());
                             table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
@@ -136,7 +136,7 @@ public class Task0GUI {
                 table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
             }
             else if(action.equals("See Grades")) {
-                table.setTableExamResults("", reg -> {});
+                table.setTableExamResults("", false, reg -> {});
                 table.update(DBManager.getInstance().findRegistrationStudent(formId, false));
             }
         }
