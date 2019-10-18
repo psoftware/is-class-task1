@@ -75,7 +75,7 @@ public abstract class SimpleDialog<T> extends Dialog<T> {
         private DatePicker datepicker;
 
         public DateDialog() {
-            super("Mark Dialog", "Insert Mark");
+            super("Date Dialog", "Insert Date");
         }
 
         public void addComponents(GridPane grid) {
