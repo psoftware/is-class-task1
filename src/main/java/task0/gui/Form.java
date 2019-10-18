@@ -24,6 +24,9 @@ public class Form { //01
         VBox v1 = new VBox(labelID, labelRole, labelAction);
         v1.setSpacing(15);
         VBox v2 = new VBox(id, role, action);
+        id.setPrefWidth(150);
+        role.setPrefWidth(150);
+        action.setPrefWidth(150);
         v2.setSpacing(5);
         v1.setAlignment(Pos.TOP_CENTER);
         v2.setAlignment(Pos.TOP_CENTER);

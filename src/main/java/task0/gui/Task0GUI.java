@@ -72,12 +72,13 @@ public class Task0GUI {
                     if(newV.intValue() == 0){
                         form.getAction().getItems().clear();
                         form.getAction().getItems().add("Add Exam");
-                        form.getAction().getItems().add("Add Grade"); 
+                        form.getAction().getItems().add("Add Grade");
                     }else{
                         form.getAction().getItems().clear();
                         form.getAction().getItems().add("Register/Deregister to Exam");
-                        form.getAction().getItems().add("See Grades"); 
+                        form.getAction().getItems().add("See Grades");
                     }
+                    form.getAction().getSelectionModel().selectFirst();
                 }
         });
         
