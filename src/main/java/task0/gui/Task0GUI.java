@@ -15,6 +15,7 @@ import main.java.task0.User;
 import main.java.task0.db.DBManager;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public class Task0GUI {
@@ -89,42 +90,36 @@ public class Task0GUI {
     }
     
     public void eventConfirm(String id, String role, String action){
+        int formId = Integer.parseInt(form.getID());
         if(role.equals("Professor")) {
             if(action.equals("Add Exam")) {
-                System.out.println("Add Exam");
-                User.getInstance().listCourses(this, Integer.parseInt(form.getID()));
-                //update gui, aggiungere bottoni (Datepicker, Conferma)
-                lowerHbox.getChildren().clear();
-                DatePicker examDate = new DatePicker();
-                Button confirmAddButton = new Button("Add Exam");
-                lowerHbox.getChildren().add(examDate);
-                lowerHbox.getChildren().add(confirmAddButton);
-                confirmAddButton.setOnAction((ActionEvent ev) -> {
-                        System.out.println("wasPressed");
-                        Course course = table.getSelectedCourse();
-                        Date date = Date.valueOf(examDate.getValue());
-                        System.out.println(date);
-                        User.getInstance().addExam(course.getId(), date);
-                });
+                table.setTableCourses("Add Exam Date",
+                        course -> {
+                            LocalDate newdate = SimpleDialog.DateDialog.showDialog();
+                            User.getDbManager().insertExam(course.getId(), newdate);
+                        });
+                table.update(User.getDbManager().findCourse(formId));
             }
             else if (action.equals("Add Grade")) {
                 table.setTableExamResults("Insert Mark",
                             reg -> {
                                 int mark = SimpleDialog.MarkDialog.showDialog();
                                 User.getDbManager().updateRegistration(reg.getStudentID(), reg.getDate(), reg.getCourseID(), mark);
-                                table.update(User.getDbManager().findRegistrationProfessor(Integer.parseInt(form.getID())));
+                                table.update(User.getDbManager().findRegistrationProfessor(formId));
                             });
-                table.update(User.getDbManager().findRegistrationProfessor(Integer.parseInt(form.getID())));
+                table.update(User.getDbManager().findRegistrationProfessor(formId));
             }
         } else if(role.equals("Student")) {
             if(action.equals("Register/Deregister to Exam")) {
-                User.getInstance().listExams(this);
-                SimpleDialog.MarkDialog.showDialog();
-                SimpleDialog.DateDialog.showDialog();
+                table.setTableExams("Register/Deregister",
+                        exam -> {
+                            User.getDbManager().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
+                        });
+                table.update(User.getDbManager().findExam());
             }
             else if(action.equals("See Grades")) {
                 table.setTableExamResults("", reg -> {});
-                table.update(User.getDbManager().findRegistrationStudent(Integer.parseInt(form.getID()), false));
+                table.update(User.getDbManager().findRegistrationStudent(formId, false));
             }
         }
     };
@@ -134,11 +129,6 @@ public class Task0GUI {
     //gestione delle tabella
     public void setTableExams(List list) {
         table.setTableExams("Boh", p->{});
-        table.update(list);
-    }
-
-    public void setTableCourses(List list) {
-        table.setTableCourses();
         table.update(list);
     }
 }

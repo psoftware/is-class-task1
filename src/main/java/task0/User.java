@@ -4,6 +4,7 @@ import main.java.task0.db.DBManager;
 import main.java.task0.gui.Task0GUI;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public class User {
@@ -25,7 +26,7 @@ public class User {
         return getInstance().dbManager;
     }
 
-    public void addExam(int courseId, Date date) {
+    public void addExam(int courseId, LocalDate date) {
         System.out.println(date);
         dbManager.insertExam(courseId, date);
     }
@@ -33,10 +34,5 @@ public class User {
     public void listExams(Task0GUI gui) {
         List list = dbManager.findExam();
         gui.setTableExams(list);
-    }
-
-    public void listCourses(Task0GUI gui, int professorId) {
-        List list = dbManager.findCourse(professorId);
-        gui.setTableCourses(list);
     }
 }
