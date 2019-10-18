@@ -12,8 +12,8 @@ import java.util.Optional;
 public abstract class SimpleDialog<T> extends Dialog<T> {
     public SimpleDialog(String title, String header) {
         // Create the custom dialog.
-        this.setTitle("Mark Dialog");
-        this.setHeaderText("Insert Mark");
+        this.setTitle(title);
+        this.setHeaderText(header);
 
         // Set the button types.
         ButtonType confirmButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
