@@ -75,7 +75,8 @@ public class Task0GUI {
                         form.getAction().getItems().add("Add Grade");
                     }else{
                         form.getAction().getItems().clear();
-                        form.getAction().getItems().add("Register/Deregister to Exam");
+                        form.getAction().getItems().add("Register to Exam");
+                        form.getAction().getItems().add("Deregister to Exam");
                         form.getAction().getItems().add("See Grades");
                     }
                     form.getAction().getSelectionModel().selectFirst();
@@ -120,12 +121,19 @@ public class Task0GUI {
                 table.update(DBManager.getInstance().findRegistrationProfessor(formId));
             }
         } else if(role.equals("Student")) {
-            if(action.equals("Register/Deregister to Exam")) {
-                table.setTableExams("Register/Deregister",
+            if(action.equals("Register to Exam")) {
+                table.setTableExams("Register",
                         exam -> {
                             DBManager.getInstance().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
                         });
                 table.update(DBManager.getInstance().findExam());
+            } else if(action.equals("Deregister to Exam")) {
+                table.setTableExamResults("Deregister",
+                        reg -> {
+                            DBManager.getInstance().deleteRegistration(formId, reg.getCourseID(), reg.getDate());
+                            table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
+                        });
+                table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
             }
             else if(action.equals("See Grades")) {
                 table.setTableExamResults("", reg -> {});
