@@ -1,5 +1,8 @@
 package main.java.task0;
 
+import main.java.task0.db.DBManager;
+import main.java.task0.gui.Task0GUI;
+
 import java.sql.Date;
 import java.util.List;
 

@@ -3,7 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package main.java.task0;
+package main.java.task0.db;
+
+import main.java.task0.Course;
+import main.java.task0.Exam;
+import main.java.task0.Registration;
 
 import java.sql.Connection;
 import java.sql.Date;

@@ -1,4 +1,4 @@
-package main.java.task0;
+package main.java.task0.gui;
 
 import java.util.List;
 import javafx.collections.FXCollections;
@@ -7,6 +7,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 import javafx.scene.control.cell.PropertyValueFactory;
+import main.java.task0.Course;
 
 public class Table  extends TableView {
     private final double lunghezzaTabella; //01

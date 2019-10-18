@@ -1,4 +1,4 @@
-package main.java.task0;
+package main.java.task0.gui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -12,11 +12,13 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 import javafx.event.ActionEvent;
+import main.java.task0.Course;
+import main.java.task0.User;
+
 import java.sql.Date;
-import java.time.ZoneId;
 import java.util.List;
 
-class Task0GUI {
+public class Task0GUI {
     private final double larghezzaFinestra;
     private final double lunghezzaFinestra;
     private final String font;

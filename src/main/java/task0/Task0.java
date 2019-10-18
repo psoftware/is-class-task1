@@ -3,6 +3,7 @@ package main.java.task0;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import main.java.task0.gui.Task0GUI;
 
 public class Task0 extends Application{
     private Task0GUI graphicInterface;

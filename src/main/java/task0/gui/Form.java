@@ -1,4 +1,4 @@
-package main.java.task0;
+package main.java.task0.gui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
