@@ -16,7 +16,7 @@ public abstract class SimpleDialog<T> extends Dialog<T> {
         this.setHeaderText(header);
 
         // Set the button types.
-        ButtonType confirmButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
+        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         this.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
         // Create the username and password labels and fields.
