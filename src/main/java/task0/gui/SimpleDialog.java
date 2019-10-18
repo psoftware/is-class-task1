@@ -99,4 +99,13 @@ public abstract class SimpleDialog<T> extends Dialog<T> {
             return result.orElse(null);
         }
     }
+
+    public static void showErrorDialog(String error) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error Dialog");
+        alert.setHeaderText("Error");
+        alert.setContentText(error);
+
+        alert.showAndWait();
+    }
 }

@@ -6,15 +6,11 @@
 package main.java.task0.db;
 
 import com.sun.istack.internal.Nullable;
-import main.java.task0.Course;
-import main.java.task0.Exam;
-import main.java.task0.Registration;
+import main.java.task0.*;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -153,7 +149,7 @@ public class DBManager {
         return result;
     }
     
-    public void updateRegistration (int student, Date date, int course, int grade) {
+    public void updateRegistration (int student, Date date, int course, int grade) throws TriggerSQLException {
         try {
             String sql = "UPDATE exam_result SET grade = ? WHERE (student = ?) and (course = ?) and (date = ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -165,7 +161,8 @@ public class DBManager {
         } catch (SQLException ex) {
            System.out.println("SQLException: " + ex.getMessage());
            System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());            
+           System.out.println("VendorError: " + ex.getErrorCode());
+           TriggerSQLException.ifFromTrigger(ex);
         }
     }
     
@@ -204,7 +201,7 @@ public class DBManager {
         return result;
     }
     
-    public void insertRegistration (int student, int course, Date date, @Nullable Integer grade) {
+    public void insertRegistration (int student, int course, Date date, @Nullable Integer grade) throws TriggerSQLException {
         try {
             String sql = "INSERT INTO exam_result (student, course, date, grade) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -220,6 +217,19 @@ public class DBManager {
            System.out.println("SQLException: " + ex.getMessage());
            System.out.println("SQLState: " + ex.getSQLState());
            System.out.println("VendorError: " + ex.getErrorCode());
+           TriggerSQLException.ifFromTrigger(ex);
+        }
+    }
+
+    public static class TriggerSQLException extends Exception{
+        public TriggerSQLException(String errString) {
+            super(errString);
+        }
+
+        public static void ifFromTrigger(SQLException ex) throws TriggerSQLException{
+            if(ex.getErrorCode() == 02000) {
+                throw new TriggerSQLException(ex.getMessage());
+            }
         }
     }
 }
