@@ -84,14 +84,23 @@ public class Task0GUI {
         
       form.getConfirmButton().setOnAction((ActionEvent ev) -> {
               System.out.println("wasPressedConfirm");
-              eventConfirm(form.getID(),
-                      form.getRole().getValue().toString(),
-                      form.getAction().getValue().toString());
+              if(form.getRole().getValue() != null && form.getAction().getValue() != null) {
+                  eventConfirm(form.getID(),
+                          form.getRole().getValue().toString(),
+                          form.getAction().getValue().toString());
+              }
         });
     }
     
     public void eventConfirm(String id, String role, String action){
-        int formId = Integer.parseInt(form.getID());
+        int formId;
+        try {
+            formId = Integer.parseInt(form.getID());
+        } catch (NumberFormatException e) {
+            System.out.println("Inserted id is not a number");
+            return;
+        }
+
         if(role.equals("Professor")) {
             if(action.equals("Add Exam")) {
                 table.setTableCourses("Add Exam Date",
