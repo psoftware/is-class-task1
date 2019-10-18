@@ -21,6 +21,8 @@ import java.util.logging.Logger;
  * @author adria
  */
 public class DBManager {
+    private static DBManager INSTANCE;
+
     private String address;
     private int port;
     private String DBName;
@@ -37,6 +39,14 @@ public class DBManager {
         this.address = address;
         
         connect();
+    }
+
+    public static DBManager getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new DBManager("127.0.0.1", 3306, "Task0", "root", "root");
+            INSTANCE.connect();
+        }
+        return INSTANCE;
     }
     
     public void connect () {

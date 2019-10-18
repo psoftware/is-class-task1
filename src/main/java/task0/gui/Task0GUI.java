@@ -96,30 +96,30 @@ public class Task0GUI {
                 table.setTableCourses("Add Exam Date",
                         course -> {
                             LocalDate newdate = SimpleDialog.DateDialog.showDialog();
-                            User.getDbManager().insertExam(course.getId(), newdate);
+                            DBManager.getInstance().insertExam(course.getId(), newdate);
                         });
-                table.update(User.getDbManager().findCourse(formId));
+                table.update(DBManager.getInstance().findCourse(formId));
             }
             else if (action.equals("Add Grade")) {
                 table.setTableExamResults("Insert Mark",
                             reg -> {
                                 int mark = SimpleDialog.MarkDialog.showDialog();
-                                User.getDbManager().updateRegistration(reg.getStudentID(), reg.getDate(), reg.getCourseID(), mark);
-                                table.update(User.getDbManager().findRegistrationProfessor(formId));
+                                DBManager.getInstance().updateRegistration(reg.getStudentID(), reg.getDate(), reg.getCourseID(), mark);
+                                table.update(DBManager.getInstance().findRegistrationProfessor(formId));
                             });
-                table.update(User.getDbManager().findRegistrationProfessor(formId));
+                table.update(DBManager.getInstance().findRegistrationProfessor(formId));
             }
         } else if(role.equals("Student")) {
             if(action.equals("Register/Deregister to Exam")) {
                 table.setTableExams("Register/Deregister",
                         exam -> {
-                            User.getDbManager().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
+                            DBManager.getInstance().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
                         });
-                table.update(User.getDbManager().findExam());
+                table.update(DBManager.getInstance().findExam());
             }
             else if(action.equals("See Grades")) {
                 table.setTableExamResults("", reg -> {});
-                table.update(User.getDbManager().findRegistrationStudent(formId, false));
+                table.update(DBManager.getInstance().findRegistrationStudent(formId, false));
             }
         }
     };
