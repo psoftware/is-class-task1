@@ -28,13 +28,11 @@ public class User {
 
     public void listExams(Task0GUI gui) {
         List list = dbManager.findExam();
-        gui.setTableExams();
-        gui.updateTable(list);
+        gui.setTableExams(list);
     }
 
     public void listCourses(Task0GUI gui, int professorId) {
         List list = dbManager.findCourse(professorId);
-        gui.setTableCourses();
-        gui.updateTable(list);
+        gui.setTableCourses(list);
     }
 }

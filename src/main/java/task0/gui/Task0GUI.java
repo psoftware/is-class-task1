@@ -123,9 +123,13 @@ public class Task0GUI {
     public VBox getOuterVbox(){return outerVbox;}
 
     //gestione delle tabella
-    public void updateTable(List list) {
+    public void setTableExams(List list) {
+        table.setTableExams();
         table.update(list);
     }
-    public void setTableExams() {table.setTableExams();}
-    public void setTableCourses() {table.setTableCourses();}
+
+    public void setTableCourses(List list) {
+        table.setTableCourses();
+        table.update(list);
+    }
 }

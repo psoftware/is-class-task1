@@ -5,7 +5,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 import javafx.scene.control.cell.PropertyValueFactory;
 import main.java.task0.Course;
 
@@ -34,13 +33,20 @@ public class Table  extends TableView {
     public void setTableExams(){//02
         TableColumn course = new TableColumn("Course");
         TableColumn date = new TableColumn("Date");
+        TableColumn action = new TableColumn("Action");
         course.setCellValueFactory(new PropertyValueFactory("course"));
-        date.setCellValueFactory(new PropertyValueFactory("date"));;
-        
+        date.setCellValueFactory(new PropertyValueFactory("date"));
+        //action.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+
+        action.setCellFactory(TableCellButton.<Course>forTableColumn("Remove", (Course p) -> {
+            //table.getItems().remove(p);
+            return p;
+        }));
+
         listaOsservabile = FXCollections.observableArrayList();
         setItems(listaOsservabile);
         getColumns().clear();
-        getColumns().addAll(course, date);
+        getColumns().addAll(course, date, action);
     }
     
     public void setTableCourses(){//02

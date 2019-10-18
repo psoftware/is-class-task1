@@ -24,13 +24,13 @@ import java.util.logging.Logger;
  * @author adria
  */
 public class DBManager {
-    private String address = "localhost";
-    private int port = 3306;
-    private String DBName = "Task0";
-    private String user = "root";
-    private String password = "root";
+    private String address;
+    private int port;
+    private String DBName;
+    private String user;
+    private String password;
     
-    Connection conn = null;
+    private Connection conn;
     
     public DBManager (String address, int port, String DBName, String user, String password) {
         this.DBName = DBName;
@@ -45,6 +45,7 @@ public class DBManager {
     public void connect () {
         try {
             String url = "jdbc:mysql://" + address + ":" + Integer.toString(port) + "/" + DBName + "?&serverTimezone=UTC";
+            System.out.println(url);
             conn = DriverManager.getConnection(url, user, password);
         } catch (SQLException ex) {
            System.out.println("SQLException: " + ex.getMessage());
