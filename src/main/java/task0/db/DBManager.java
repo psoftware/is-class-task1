@@ -5,16 +5,13 @@
  */
 package main.java.task0.db;
 
+import com.sun.istack.internal.Nullable;
 import main.java.task0.Course;
 import main.java.task0.Exam;
 import main.java.task0.Registration;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,12 +82,12 @@ public class DBManager {
         return result;
     }
     
-    public void insertExam (int courseID, Date date) {
+    public void insertExam (int courseID, LocalDate date) {
         try {
             String sql = "INSERT INTO exam (course, date) VALUES(?, ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, courseID);
-            pstmt.setDate(2, date); //imposta la data a un giorno precedente
+            pstmt.setDate(2, Date.valueOf(date)); //imposta la data a un giorno precedente
             pstmt.executeUpdate();
         } catch (SQLException ex) {
            System.out.println("SQLException: " + ex.getMessage());
@@ -197,14 +194,18 @@ public class DBManager {
         return result;
     }
     
-    public void insertRegistration (int student, int course, Date date, int grade) {
+    public void insertRegistration (int student, int course, Date date, @Nullable Integer grade) {
         try {
             String sql = "INSERT INTO exam_result (student, course, date, grade) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, student);
             pstmt.setInt(2, course);
             pstmt.setDate(3, date);
-            pstmt.setInt(4, grade);
+            if(grade == null)
+                pstmt.setNull(4, Types.INTEGER);
+            else
+                pstmt.setInt(4, grade);
+            pstmt.executeUpdate();
         } catch (SQLException ex) {
            System.out.println("SQLException: " + ex.getMessage());
            System.out.println("SQLState: " + ex.getSQLState());
