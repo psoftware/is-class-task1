@@ -102,7 +102,7 @@ public class DBManager {
     public ArrayList<Registration> findRegistrationProfessor (int id) {
         ArrayList<Registration> result = null;
         try {
-            String sql = "SELECT course, name, cfu, student, date FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE c.professor = ?";
+            String sql = "SELECT course, name, cfu, student, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE c.professor = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.execute();
@@ -125,9 +125,9 @@ public class DBManager {
         try {
             String sql;
             if (toDo) {
-                sql = "SELECT course, name, cfu, date FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE e.student = ? AND grade is NULL";
+                sql = "SELECT course, name, cfu, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE e.student = ? AND grade is NULL";
             } else {
-                sql = "SELECT course, name, cfu, date FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE e.student = ? AND grade is not NULL";
+                sql = "SELECT course, name, cfu, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE e.student = ? AND grade is not NULL";
             }
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
