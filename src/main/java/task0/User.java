@@ -21,6 +21,10 @@ public class User {
         return user;
     }
 
+    public static DBManager getDbManager() {
+        return getInstance().dbManager;
+    }
+
     public void addExam(int courseId, Date date) {
         System.out.println(date);
         dbManager.insertExam(courseId, date);

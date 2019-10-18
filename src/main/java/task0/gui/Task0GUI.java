@@ -3,9 +3,7 @@ package main.java.task0.gui;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -14,6 +12,7 @@ import javafx.scene.text.FontWeight;
 import javafx.event.ActionEvent;
 import main.java.task0.Course;
 import main.java.task0.User;
+import main.java.task0.db.DBManager;
 
 import java.sql.Date;
 import java.util.List;
@@ -109,14 +108,24 @@ public class Task0GUI {
                 });
             }
             else if (action.equals("Add Grade")) {
-                User.getInstance().listExams(this);
-                //update gui, aggiungere bottoni (Textfield(voto), conferma)
+                table.setTableExamResults("Insert Mark",
+                            reg -> {
+                                int mark = SimpleDialog.MarkDialog.showDialog();
+                                User.getDbManager().updateRegistration(reg.getStudentID(), reg.getDate(), reg.getCourseID(), mark);
+                                table.update(User.getDbManager().findRegistrationProfessor(Integer.parseInt(form.getID())));
+                            });
+                table.update(User.getDbManager().findRegistrationProfessor(Integer.parseInt(form.getID())));
             }
         } else if(role.equals("Student")) {
-            if(action.equals("Register/Deregister to Exam"))
-                ;
-            else if(action.equals("See Grades"))
-                ;
+            if(action.equals("Register/Deregister to Exam")) {
+                User.getInstance().listExams(this);
+                SimpleDialog.MarkDialog.showDialog();
+                SimpleDialog.DateDialog.showDialog();
+            }
+            else if(action.equals("See Grades")) {
+                table.setTableExamResults("", reg -> {});
+                table.update(User.getDbManager().findRegistrationStudent(Integer.parseInt(form.getID()), false));
+            }
         }
     };
 
@@ -124,7 +133,7 @@ public class Task0GUI {
 
     //gestione delle tabella
     public void setTableExams(List list) {
-        table.setTableExams();
+        table.setTableExams("Boh", p->{});
         table.update(list);
     }
 
