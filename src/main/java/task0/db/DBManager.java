@@ -77,7 +77,7 @@ public class DBManager {
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Course>();
             while (rs.next()){
-                Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"));
+                Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"), rs.getInt("professor"));
                 result.add(c);
             }
         } catch (SQLException ex) {

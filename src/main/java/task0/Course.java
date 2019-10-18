@@ -13,11 +13,13 @@ public class Course {
     private int id;
     private String name;
     private int cfu;
+    private int professor;
     
-    public Course (int id, String name, int cfu){
+    public Course (int id, String name, int cfu, int professor){
         this.id = id;
         this.name = name;
         this.cfu = cfu;
+        this.professor = professor;
     }
 
     public int getId () {
@@ -30,5 +32,7 @@ public class Course {
     
     public int getCfu () {
         return cfu;
-    }  
+    }
+
+    public int getProfessor() { return professor; }
 }
