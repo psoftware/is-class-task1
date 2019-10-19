@@ -29,8 +29,9 @@ public class Task0GUI {
     private final HBox lowerHbox;
     
     public Task0GUI(){
+
         larghezzaFinestra = 650;
-        lunghezzaFinestra = 700;
+        lunghezzaFinestra = 550;
         font = "Arial";
         background = "ALICEBLUE";
         
