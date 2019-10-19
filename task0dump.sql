@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.17, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.18, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: task0_db
+-- Host: localhost    Database: task0
 -- ------------------------------------------------------
--- Server version	8.0.17
+-- Server version	8.0.18
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -65,8 +65,28 @@ CREATE TABLE `exam` (
 
 LOCK TABLES `exam` WRITE;
 /*!40000 ALTER TABLE `exam` DISABLE KEYS */;
+INSERT INTO `exam` VALUES (1,'2019-09-10'),(1,'2019-10-10'),(1,'2019-11-20'),(2,'2019-10-10'),(2,'2019-11-20');
 /*!40000 ALTER TABLE `exam` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `checkExamDate` BEFORE INSERT ON `exam` FOR EACH ROW BEGIN
+		IF(current_date() >= NEW.date) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert an exam for  the current or past date';
+		END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `exam_result`
@@ -94,8 +114,77 @@ CREATE TABLE `exam_result` (
 
 LOCK TABLES `exam_result` WRITE;
 /*!40000 ALTER TABLE `exam_result` DISABLE KEYS */;
+INSERT INTO `exam_result` VALUES (1,1,'2019-09-10',18),(1,1,'2019-11-20',NULL),(1,2,'2019-10-10',18),(2,1,'2019-09-10',30),(2,2,'2019-10-10',30),(2,2,'2019-11-20',NULL);
 /*!40000 ALTER TABLE `exam_result` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `checkRegistration` BEFORE INSERT ON `exam_result` FOR EACH ROW BEGIN
+		IF(current_date() >= NEW.date or 	((SELECT COUNT(*) 
+											FROM exam_result 
+                                            WHERE student = NEW.student 
+												AND course = NEW.course
+												AND grade is not null ) != 0 ) 
+		) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot register to an old or already took exam';
+		END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `checkGrade` BEFORE UPDATE ON `exam_result` FOR EACH ROW BEGIN
+		IF(current_date() < NEW.date) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert a mark for an exam in the future';
+        ELSE
+			DELETE 
+            FROM exam_result
+            WHERE student = NEW.student
+				AND course = NEW.course
+                AND date <> NEW.date;
+		END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `checkDeleteRegistration` BEFORE DELETE ON `exam_result` FOR EACH ROW BEGIN
+		IF(OLD.grade is not null or (OLD.date <= current_date()) ) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot delete an old or already took exam registration';
+		END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `professor`
@@ -156,67 +245,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- can't register to an exam after the exam date
-DROP TRIGGER IF EXISTS checkRegistration;
-DELIMITER $$
-CREATE TRIGGER checkRegistration 
-BEFORE INSERT ON exam_result
-       FOR EACH ROW 
-BEGIN
-		IF(current_date() >= NEW.date or 	((SELECT COUNT(*) 
-											FROM exam_result 
-                                            WHERE student = NEW.student 
-												AND course = NEW.course
-												AND grade is not null ) != 0 ) 
-		) THEN
-			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot register to an old or already took exam';
-		END IF;
-END $$
-DELIMITER ;
-
--- can't add a grade for an exam in the future
-DROP TRIGGER IF EXISTS checkGrade;
-DELIMITER $$
-CREATE TRIGGER checkGrade
-BEFORE UPDATE ON exam_result
-       FOR EACH ROW 
-BEGIN
-		IF(current_date() < NEW.date) THEN
-			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert a mark for an exam in the future';
-        ELSE
-			DELETE 
-            FROM exam_result
-            WHERE student = NEW.student
-				AND course = NEW.course
-                AND date <> NEW.date;
-		END IF;
-END $$
-DELIMITER ;
-
--- can't add an exam for the current or past date
-DROP TRIGGER IF EXISTS checkExamDate;
-DELIMITER $$
-CREATE TRIGGER checkExamDate 
-BEFORE INSERT ON exam
-       FOR EACH ROW 
-BEGIN
-		IF(current_date() >= NEW.date) THEN
-			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert an exam for  the current or past date';
-		END IF;
-END $$
-DELIMITER ;
-
--- can't delete a registration for an old exam or an already took one
-DROP TRIGGER IF EXISTS checkDeleteRegistration;
-DELIMITER $$
-CREATE TRIGGER checkDeleteRegistration 
-BEFORE DELETE ON exam_result
-       FOR EACH ROW 
-BEGIN
-		IF(OLD.grade is not null or (OLD.date <= current_date()) ) THEN
-			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot delete an old or already took exam registration';
-		END IF;
-END $$
-DELIMITER ;
-
--- Dump completed on 2019-10-13 16:52:15
+-- Dump completed on 2019-10-19 14:31:42
