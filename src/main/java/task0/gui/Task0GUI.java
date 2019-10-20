@@ -15,6 +15,7 @@ import main.java.task0.User;
 import main.java.task0.db.DBManager;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -103,57 +104,75 @@ public class Task0GUI {
             return;
         }
 
-        if(role.equals("Professor")) {
-            if(action.equals("Add Exam")) {
-                table.setTableCourses("Add Exam Date",
-                        course -> {
-                            LocalDate newdate = SimpleDialog.DateDialog.showDialog();
-                            try {
-                                DBManager.getInstance().insertExam(course.getId(), newdate);
-                            } catch (DBManager.TriggerSQLException e) {
-                                SimpleDialog.showErrorDialog(e.getMessage());
-                            }
-                        });
-                table.update(DBManager.getInstance().findCourse(formId));
-            }
-            else if (action.equals("Add Grade")) {
-                table.setTableExamResults("Insert Mark", true,
+        try {
+            if (role.equals("Professor")) {
+                if (action.equals("Add Exam")) {
+                    table.setTableCourses("Add Exam Date",
+                            course -> {
+                                LocalDate newdate = SimpleDialog.DateDialog.showDialog();
+                                try {
+                                    DBManager.getInstance().insertExam(course.getId(), newdate);
+                                } catch (SQLException e) {
+                                    showError(e);
+                                }
+                            });
+                    table.update(DBManager.getInstance().findCourse(formId));
+                } else if (action.equals("Add Grade")) {
+                    table.setTableExamResults("Insert Mark", true,
                             reg -> {
                                 int mark = SimpleDialog.MarkDialog.showDialog();
                                 try {
                                     DBManager.getInstance().updateRegistration(reg.getStudentID(), reg.getDate(), reg.getCourseID(), mark);
-                                } catch (DBManager.TriggerSQLException e) {
-                                    SimpleDialog.showErrorDialog(e.getMessage());
+                                    table.update(DBManager.getInstance().findRegistrationProfessor(formId));
+                                } catch (SQLException e) {
+                                    showError(e);
                                 }
-                                table.update(DBManager.getInstance().findRegistrationProfessor(formId));
                             });
-                table.update(DBManager.getInstance().findRegistrationProfessor(formId));
+                    table.update(DBManager.getInstance().findRegistrationProfessor(formId));
+                }
+            } else if (role.equals("Student")) {
+                if (action.equals("Register to Exam")) {
+                    table.setTableExams("Register",
+                            exam -> {
+                                try {
+                                    DBManager.getInstance().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
+                                } catch (SQLException e) {
+                                    showError(e);
+                                }
+                            });
+                    table.update(DBManager.getInstance().findExam());
+                } else if (action.equals("Deregister to Exam")) {
+                    table.setTableExamResults("Deregister", false,
+                            reg -> {
+                                try {
+                                    DBManager.getInstance().deleteRegistration(formId, reg.getCourseID(), reg.getDate());
+                                    table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
+                                } catch (SQLException e) {
+                                    showError(e);
+                                }
+                            });
+                    table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
+                } else if (action.equals("See Grades")) {
+                    table.setTableExamResults("", false, null);
+                    table.update(DBManager.getInstance().findRegistrationStudent(formId, false));
+                }
             }
-        } else if(role.equals("Student")) {
-            if(action.equals("Register to Exam")) {
-                table.setTableExams("Register",
-                        exam -> {
-                            try {
-                                DBManager.getInstance().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
-                            } catch (DBManager.TriggerSQLException e) {
-                                SimpleDialog.showErrorDialog(e.getMessage());
-                            }
-                        });
-                table.update(DBManager.getInstance().findExam());
-            } else if(action.equals("Deregister to Exam")) {
-                table.setTableExamResults("Deregister", false,
-                        reg -> {
-                            DBManager.getInstance().deleteRegistration(formId, reg.getCourseID(), reg.getDate());
-                            table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
-                        });
-                table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
-            }
-            else if(action.equals("See Grades")) {
-                table.setTableExamResults("", false, null);
-                table.update(DBManager.getInstance().findRegistrationStudent(formId, false));
-            }
+        } catch(SQLException ex) {
+            showError(ex);
         }
     };
+
+    public void showError(SQLException ex) {
+        String errString;
+
+        if(ex instanceof DBManager.TriggerSQLException)
+            errString = ((DBManager.TriggerSQLException)ex).getTriggerMessage();
+        else
+            errString = "SQLException: " + ex.getMessage() +
+                    "\nSQLState: " + ex.getSQLState() +
+                    "\nVendorError: " + ex.getErrorCode();
+        SimpleDialog.showErrorDialog(errString);
+    }
 
     public VBox getOuterVbox(){return outerVbox;}
 }
