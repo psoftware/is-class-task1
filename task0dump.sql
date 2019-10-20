@@ -15,6 +15,8 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+SET SQL_SAFE_UPDATE = 0;
+
 --
 -- Table structure for table `course`
 --
@@ -65,21 +67,21 @@ CREATE TABLE `exam` (
 
 LOCK TABLES `exam` WRITE;
 /*!40000 ALTER TABLE `exam` DISABLE KEYS */;
-INSERT INTO `exam` VALUES (1,'2019-09-10'),(1,'2019-10-10'),(1,'2019-11-20'),(2,'2019-10-10'),(2,'2019-11-20');
+INSERT INTO `exam` VALUES (1,'2019-09-10'),(1,'2019-10-10'),(1,'2019-11-20'),(2,'2019-10-10'),(2,'2019-11-20'),(3,'2019-10-31');
 /*!40000 ALTER TABLE `exam` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `checkExamDate` BEFORE INSERT ON `exam` FOR EACH ROW BEGIN
 		IF(current_date() >= NEW.date) THEN
-			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert an exam for  the current or past date';
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert an exam for the current or past date';
 		END IF;
 END */;;
 DELIMITER ;
@@ -114,26 +116,29 @@ CREATE TABLE `exam_result` (
 
 LOCK TABLES `exam_result` WRITE;
 /*!40000 ALTER TABLE `exam_result` DISABLE KEYS */;
-INSERT INTO `exam_result` VALUES (1,1,'2019-09-10',18),(1,1,'2019-11-20',NULL),(1,2,'2019-10-10',18),(2,1,'2019-09-10',30),(2,2,'2019-10-10',30),(2,2,'2019-11-20',NULL);
+INSERT INTO `exam_result` VALUES (1,1,'2019-09-10',18),(1,2,'2019-10-10',18),(2,1,'2019-09-10',30),(2,2,'2019-10-10',30);
 /*!40000 ALTER TABLE `exam_result` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `checkRegistration` BEFORE INSERT ON `exam_result` FOR EACH ROW BEGIN
-		IF(current_date() >= NEW.date or 	((SELECT COUNT(*) 
-											FROM exam_result 
-                                            WHERE student = NEW.student 
-												AND course = NEW.course
-												AND grade is not null ) != 0 ) 
-		) THEN
-			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot register to an old or already took exam';
+		IF(current_date() >= NEW.date) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot register to an old exam';
+		END IF;
+        
+        IF ((SELECT COUNT(*) 
+			FROM exam_result 
+			WHERE student = NEW.student 
+				AND course = NEW.course
+				AND grade is not null ) != 0 ) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot register to an already took exam';
 		END IF;
 END */;;
 DELIMITER ;
@@ -144,21 +149,15 @@ DELIMITER ;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `checkGrade` BEFORE UPDATE ON `exam_result` FOR EACH ROW BEGIN
 		IF(current_date() < NEW.date) THEN
 			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot insert a mark for an exam in the future';
-        ELSE
-			DELETE 
-            FROM exam_result
-            WHERE student = NEW.student
-				AND course = NEW.course
-                AND date <> NEW.date;
 		END IF;
 END */;;
 DELIMITER ;
@@ -169,15 +168,19 @@ DELIMITER ;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `checkDeleteRegistration` BEFORE DELETE ON `exam_result` FOR EACH ROW BEGIN
-		IF(OLD.grade is not null or (OLD.date <= current_date()) ) THEN
-			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot delete an old or already took exam registration';
+		IF(OLD.grade is not null ) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot delete an already took exam registration';
+		END IF;
+        
+        IF( OLD.date <= current_date() ) THEN
+			SIGNAL SQLSTATE '02000' SET MESSAGE_TEXT = 'Cannot delete an old exam registration';
 		END IF;
 END */;;
 DELIMITER ;
@@ -235,6 +238,43 @@ LOCK TABLES `student` WRITE;
 INSERT INTO `student` VALUES (1,'Paolo','Verdi'),(2,'Gino','Neri');
 /*!40000 ALTER TABLE `student` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'task0'
+--
+/*!50106 SET @save_time_zone= @@TIME_ZONE */ ;
+/*!50106 DROP EVENT IF EXISTS `checkFutureRegistrations` */;
+DELIMITER ;;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
+/*!50003 SET character_set_client  = utf8mb4 */ ;;
+/*!50003 SET character_set_results = utf8mb4 */ ;;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;;
+/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
+/*!50003 SET time_zone             = 'SYSTEM' */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `checkFutureRegistrations` ON SCHEDULE EVERY 24 HOUR STARTS '2019-10-20 17:03:15' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+		DELETE 
+		FROM exam_result e
+        WHERE EXISTS 	(SELECT *
+						FROM (SELECT * FROM exam_result e1) AS e1
+                        WHERE e1.student = e.student
+							AND e1.course = e.course
+                            AND e1.date < e.date
+                            AND e1.grade is not null
+                        );
+
+
+END */ ;;
+/*!50003 SET time_zone             = @saved_time_zone */ ;;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;;
+/*!50003 SET character_set_results = @saved_cs_results */ ;;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;;
+DELIMITER ;
+/*!50106 SET TIME_ZONE= @save_time_zone */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -245,4 +285,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-10-19 14:31:42
+-- Dump completed on 2019-10-20 17:06:10
