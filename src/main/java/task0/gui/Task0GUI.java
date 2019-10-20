@@ -121,8 +121,7 @@ public class Task0GUI {
                             reg -> {
                                 int mark = SimpleDialog.MarkDialog.showDialog();
                                 try {
-                                    // TODO: simplify method parameter types
-                                    DBManager.getInstance().updateRegistration(reg.getStudent().getId(), reg.getExam().getDate(), reg.getExam().getCourse().getId(), mark);
+                                    DBManager.getInstance().updateRegistration(reg, mark);
                                 } catch (DBManager.TriggerSQLException e) {
                                     SimpleDialog.showErrorDialog(e.getMessage());
                                 }
@@ -135,8 +134,7 @@ public class Task0GUI {
                 table.setTableExams("Register",
                         exam -> {
                             try {
-                                // TODO: simplify method parameter types
-                                DBManager.getInstance().insertRegistration(formId, exam.getCourse().getId(), exam.getDate(), null);
+                                DBManager.getInstance().insertRegistration(formId, exam, null);
                             } catch (DBManager.TriggerSQLException e) {
                                 SimpleDialog.showErrorDialog(e.getMessage());
                             }
@@ -145,8 +143,7 @@ public class Task0GUI {
             } else if(action.equals("Deregister to Exam")) {
                 table.setTableExamResults("Deregister", false,
                         reg -> {
-                            // TODO: simplify method parameter types
-                            DBManager.getInstance().deleteRegistration(formId, reg.getExam().getCourse().getId(), reg.getExam().getDate());
+                            DBManager.getInstance().deleteRegistration(formId, reg.getExam());
                             table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
                         });
                 table.update(DBManager.getInstance().findRegistrationStudent(formId, true));

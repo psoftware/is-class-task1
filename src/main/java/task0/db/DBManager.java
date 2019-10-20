@@ -168,14 +168,14 @@ public class DBManager {
         return result;
     }
     
-    public void updateRegistration (int student, Date date, int course, int grade) throws TriggerSQLException {
+    public void updateRegistration (Registration reg, int grade) throws TriggerSQLException {
         try {
             String sql = "UPDATE exam_result SET grade = ? WHERE (student = ?) and (course = ?) and (date = ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, grade);
-            pstmt.setInt(2, student);
-            pstmt.setInt(3, course);
-            pstmt.setDate(4, date);
+            pstmt.setInt(2, reg.getStudent().getId());
+            pstmt.setInt(3, reg.getExam().getCourse().getId());
+            pstmt.setDate(4, reg.getExam().getDate());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
            System.out.println("SQLException: " + ex.getMessage());
@@ -185,13 +185,13 @@ public class DBManager {
         }
     }
     
-    public void deleteRegistration (int student, int course, Date date) {
+    public void deleteRegistration (int studentId, Exam exam) {
         try {
             String sql = "DELETE FROM exam_result WHERE (student = ?) and (course = ?) and (date = ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, student);
-            pstmt.setInt(2, course);
-            pstmt.setDate(3, date);
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, exam.getCourse().getId());
+            pstmt.setDate(3, exam.getDate());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
            System.out.println("SQLException: " + ex.getMessage());
@@ -224,13 +224,13 @@ public class DBManager {
         return result;
     }
     
-    public void insertRegistration (int student, int course, Date date, @Nullable Integer grade) throws TriggerSQLException {
+    public void insertRegistration (int studentId, Exam exam, @Nullable Integer grade) throws TriggerSQLException {
         try {
             String sql = "INSERT INTO exam_result (student, course, date, grade) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, student);
-            pstmt.setInt(2, course);
-            pstmt.setDate(3, date);
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, exam.getCourse().getId());
+            pstmt.setDate(3, exam.getDate());
             if(grade == null)
                 pstmt.setNull(4, Types.INTEGER);
             else
