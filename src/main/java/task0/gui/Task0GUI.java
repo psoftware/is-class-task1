@@ -121,7 +121,8 @@ public class Task0GUI {
                             reg -> {
                                 int mark = SimpleDialog.MarkDialog.showDialog();
                                 try {
-                                    DBManager.getInstance().updateRegistration(reg.getStudentID(), reg.getDate(), reg.getCourseID(), mark);
+                                    // TODO: simplify method parameter types
+                                    DBManager.getInstance().updateRegistration(reg.getStudent().getId(), reg.getExam().getDate(), reg.getExam().getCourse().getId(), mark);
                                 } catch (DBManager.TriggerSQLException e) {
                                     SimpleDialog.showErrorDialog(e.getMessage());
                                 }
@@ -134,7 +135,8 @@ public class Task0GUI {
                 table.setTableExams("Register",
                         exam -> {
                             try {
-                                DBManager.getInstance().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
+                                // TODO: simplify method parameter types
+                                DBManager.getInstance().insertRegistration(formId, exam.getCourse().getId(), exam.getDate(), null);
                             } catch (DBManager.TriggerSQLException e) {
                                 SimpleDialog.showErrorDialog(e.getMessage());
                             }
@@ -143,7 +145,8 @@ public class Task0GUI {
             } else if(action.equals("Deregister to Exam")) {
                 table.setTableExamResults("Deregister", false,
                         reg -> {
-                            DBManager.getInstance().deleteRegistration(formId, reg.getCourseID(), reg.getDate());
+                            // TODO: simplify method parameter types
+                            DBManager.getInstance().deleteRegistration(formId, reg.getExam().getCourse().getId(), reg.getExam().getDate());
                             table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
                         });
                 table.update(DBManager.getInstance().findRegistrationStudent(formId, true));

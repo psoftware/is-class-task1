@@ -4,11 +4,15 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.sun.istack.internal.Nullable;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
+
 import main.java.task0.Course;
 import main.java.task0.Exam;
 import main.java.task0.Registration;
@@ -34,14 +38,34 @@ public class Table  extends TableView {
         this.setTableExams("", p->{});
        
     }
+
+    /*
+    public void setTable(List<Pair<String,String>> columnList) {
+        listaOsservabile = FXCollections.observableArrayList();
+        setItems(listaOsservabile);
+        getColumns().clear();
+
+        for(Pair<String,String> pair : columnList) {
+            TableColumn column = new TableColumn(pair.getKey());
+            column.setCellValueFactory(new PropertyValueFactory(pair.getValue()));
+            getColumns().add(column);
+        }
+    }*/
+
+    public static class MappedTableColumn<T>  {
+        public static <T> Callback<TableColumn.CellDataFeatures<T, String>, ObservableValue<String>> build(
+                Callback<T, String> stringFun) {
+            return column -> new ReadOnlyObjectWrapper<String>(stringFun.call(column.getValue()));
+        }
+    }
     
     public void setTableExams(String actionName, @Nullable Consumer<Exam> callback){//02
         getColumns().clear();
 
         TableColumn course = new TableColumn("Course");
         TableColumn date = new TableColumn("Date");
-        course.setCellValueFactory(new PropertyValueFactory("course"));
-        date.setCellValueFactory(new PropertyValueFactory("date"));
+        course.setCellValueFactory(MappedTableColumn.<Exam>build(p -> p.getCourse().getName()));
+        date.setCellValueFactory((MappedTableColumn.<Exam>build(p -> p.getDate().toString())));
         getColumns().addAll(course, date);
 
         if(callback != null) {
@@ -64,9 +88,9 @@ public class Table  extends TableView {
         TableColumn id = new TableColumn("ID");
         TableColumn name = new TableColumn("Name");
         TableColumn cfu = new TableColumn("CFU");
-        id.setCellValueFactory(new PropertyValueFactory("id"));
-        name.setCellValueFactory(new PropertyValueFactory("name"));
-        cfu.setCellValueFactory(new PropertyValueFactory("cfu"));
+        id.setCellValueFactory(MappedTableColumn.<Course>build(p -> Integer.toString(p.getId())));
+        name.setCellValueFactory(MappedTableColumn.<Course>build(Course::getName));
+        cfu.setCellValueFactory(MappedTableColumn.<Course>build(p -> Integer.toString(p.getCfu())));
         getColumns().addAll(id, name, cfu);
 
         if(callback != null) {
@@ -88,7 +112,7 @@ public class Table  extends TableView {
 
         if(showStudentId) {
             TableColumn student = new TableColumn("Student");
-            student.setCellValueFactory(new PropertyValueFactory("studentID"));
+            student.setCellValueFactory(MappedTableColumn.<Registration>build(p -> Integer.toString(p.getStudent().getId())));
             getColumns().add(student);
         }
 
@@ -96,9 +120,9 @@ public class Table  extends TableView {
         TableColumn date = new TableColumn("Date");
         TableColumn grade = new TableColumn("Grade");
 
-        course.setCellValueFactory(new PropertyValueFactory("course"));
-        date.setCellValueFactory(new PropertyValueFactory("date"));
-        grade.setCellValueFactory(new PropertyValueFactory("grade"));
+        course.setCellValueFactory(MappedTableColumn.<Registration>build(p -> p.getExam().getCourse().getName()));
+        date.setCellValueFactory((MappedTableColumn.<Registration>build(p -> p.getExam().getDate().toString())));
+        grade.setCellValueFactory(MappedTableColumn.<Registration>build(p -> Integer.toString(p.getGrade())));
         getColumns().addAll(course, date, grade);
 
         if(callback != null) {

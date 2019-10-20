@@ -106,14 +106,21 @@ public class DBManager {
     public ArrayList<Registration> findRegistrationProfessor (int id) {
         ArrayList<Registration> result = null;
         try {
-            String sql = "SELECT course, name, cfu, student, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE c.professor = ?";
+            String sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, s.name, s.surname FROM exam_result e " +
+                    "INNER JOIN course c ON c.id = e.course " +
+                    "INNER JOIN student s ON s.id = e.student " +
+                    "INNER JOIN exam ex ON ex.course = c.id " +
+                    "WHERE c.professor = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Registration>();
             while (rs.next()) {
-                Registration reg = new Registration(rs.getInt("student"), rs.getString("name"), rs.getInt("course"), rs.getDate("date"), rs.getInt("grade"));
+                Student student = new Student(rs.getInt("student"), rs.getString("s.name"), rs.getString("s.surname"));
+                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), rs.getInt("c.professor"));
+                Exam exam = new Exam(course, rs.getDate("date"));
+                Registration reg = new Registration(student, exam, rs.getInt("grade"));
                 result.add(reg);
             }
         } catch (SQLException ex) {
@@ -129,9 +136,17 @@ public class DBManager {
         try {
             String sql;
             if (toDo) {
-                sql = "SELECT course, name, cfu, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE e.student = ? AND grade is NULL";
+                sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, s.name, s.surname FROM exam_result e " +
+                        "INNER JOIN course c ON c.id = e.course " +
+                        "INNER JOIN student s ON s.id = e.student " +
+                        "INNER JOIN exam ex ON ex.course = c.id " +
+                        "WHERE e.student = ? AND grade is NULL";
             } else {
-                sql = "SELECT course, name, cfu, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE e.student = ? AND grade is not NULL";
+                sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, s.name, s.surname FROM exam_result e " +
+                        "INNER JOIN course c ON c.id = e.course " +
+                        "INNER JOIN student s ON s.id = e.student " +
+                        "INNER JOIN exam ex ON ex.course = c.id " +
+                        "WHERE e.student = ? AND grade is not NULL";
             }
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
@@ -139,7 +154,10 @@ public class DBManager {
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Registration>();
             while (rs.next()) {
-                Registration reg = new Registration(id, rs.getString("name"), rs.getInt("course"), rs.getDate("date"), rs.getInt("grade"));
+                Student student = new Student(rs.getInt("student"), rs.getString("s.name"), rs.getString("s.surname"));
+                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), rs.getInt("c.professor"));
+                Exam exam = new Exam(course, rs.getDate("date"));
+                Registration reg = new Registration(student, exam, rs.getInt("grade"));
                 result.add(reg);
             }
         } catch (SQLException ex) {
@@ -185,13 +203,14 @@ public class DBManager {
     public ArrayList<Exam> findExam () {
         ArrayList<Exam> result = null;
         try {
-            String sql = "SELECT course, date, name FROM exam e INNER JOIN course c ON c.id = e.course";
+            String sql = "SELECT c.id, c.name, c.cfu, c.professor, course, e.date FROM exam e INNER JOIN course c ON c.id = e.course";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<>();
             while (rs.next()) {
-                Exam e = new Exam(rs.getDate("date"), rs.getInt("course"), rs.getString("name"));
+                Course c = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), rs.getInt("c.professor"));
+                Exam e = new Exam(c, rs.getDate("e.date"));
                 result.add(e);
             }
         } catch (SQLException ex) {

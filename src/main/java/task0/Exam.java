@@ -13,12 +13,10 @@ import java.sql.Date;
  */
 public class Exam {
     private Date date;
-    private int courseID;
-    private String course;
+    private Course course;
     
-    public Exam (Date date, int courseID, String course) {
+    public Exam (Course course, Date date) {
         this.date = date;
-        this.courseID = courseID;
         this.course = course;
     }
     
@@ -26,11 +24,7 @@ public class Exam {
         return date;
     }
     
-    public int getCourseID () {
-        return courseID;
-    }
-    
-    public String getCourse () {
+    public Course getCourse () {
         return course;
     }
 }
