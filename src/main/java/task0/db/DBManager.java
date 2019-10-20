@@ -70,14 +70,15 @@ public class DBManager {
     public ArrayList<Course> findCourse (int profID) {
         ArrayList<Course> result = null;
         try {
-            String sql = "SELECT * FROM course WHERE professor = ?";
+            String sql = "SELECT c.*, pr.* FROM course c INNER JOIN professor pr ON pr.id = professor WHERE professor = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, profID);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Course>();
             while (rs.next()){
-                Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"), rs.getInt("professor"));
+                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+                Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"), professor);
                 result.add(c);
             }
         } catch (SQLException ex) {
@@ -106,10 +107,11 @@ public class DBManager {
     public ArrayList<Registration> findRegistrationProfessor (int id) {
         ArrayList<Registration> result = null;
         try {
-            String sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, s.name, s.surname FROM exam_result e " +
+            String sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, s.name, s.surname, pr.id, pr.name, pr.surname FROM exam_result e " +
                     "INNER JOIN course c ON c.id = e.course " +
                     "INNER JOIN student s ON s.id = e.student " +
                     "INNER JOIN exam ex ON ex.course = c.id " +
+                    "INNER JOIN professor pr ON pr.id = c.professor " +
                     "WHERE c.professor = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
@@ -118,7 +120,8 @@ public class DBManager {
             result = new ArrayList<Registration>();
             while (rs.next()) {
                 Student student = new Student(rs.getInt("student"), rs.getString("s.name"), rs.getString("s.surname"));
-                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), rs.getInt("c.professor"));
+                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam exam = new Exam(course, rs.getDate("date"));
                 Registration reg = new Registration(student, exam, rs.getInt("grade"));
                 result.add(reg);
@@ -134,20 +137,17 @@ public class DBManager {
     public ArrayList<Registration> findRegistrationStudent (int id, boolean toDo) {
         ArrayList<Registration> result = null;
         try {
-            String sql;
-            if (toDo) {
-                sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, s.name, s.surname FROM exam_result e " +
-                        "INNER JOIN course c ON c.id = e.course " +
-                        "INNER JOIN student s ON s.id = e.student " +
-                        "INNER JOIN exam ex ON ex.course = c.id " +
-                        "WHERE e.student = ? AND grade is NULL";
-            } else {
-                sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, s.name, s.surname FROM exam_result e " +
-                        "INNER JOIN course c ON c.id = e.course " +
-                        "INNER JOIN student s ON s.id = e.student " +
-                        "INNER JOIN exam ex ON ex.course = c.id " +
-                        "WHERE e.student = ? AND grade is not NULL";
-            }
+            String sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, " +
+                    "s.name, s.surname, pr.id, pr.name, pr.surname FROM exam_result e " +
+                    "INNER JOIN course c ON c.id = e.course " +
+                    "INNER JOIN student s ON s.id = e.student " +
+                    "INNER JOIN professor pr ON pr.id = c.professor " +
+                    "INNER JOIN exam ex ON ex.course = c.id ";
+            if (toDo)
+                sql += "WHERE e.student = ? AND grade is NULL";
+            else
+                sql += "WHERE e.student = ? AND grade is not NULL";
+
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.execute();
@@ -155,7 +155,8 @@ public class DBManager {
             result = new ArrayList<Registration>();
             while (rs.next()) {
                 Student student = new Student(rs.getInt("student"), rs.getString("s.name"), rs.getString("s.surname"));
-                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), rs.getInt("c.professor"));
+                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam exam = new Exam(course, rs.getDate("date"));
                 Registration reg = new Registration(student, exam, rs.getInt("grade"));
                 result.add(reg);
@@ -203,13 +204,16 @@ public class DBManager {
     public ArrayList<Exam> findExam () {
         ArrayList<Exam> result = null;
         try {
-            String sql = "SELECT c.id, c.name, c.cfu, c.professor, course, e.date FROM exam e INNER JOIN course c ON c.id = e.course";
+            String sql = "SELECT c.id, c.name, c.cfu, c.professor, course, e.date, pr.* FROM exam e " +
+                    "INNER JOIN course c ON c.id = e.course " +
+                    "INNER JOIN professor pr ON pr.id = c.professor; ";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<>();
             while (rs.next()) {
-                Course c = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), rs.getInt("c.professor"));
+                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+                Course c = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam e = new Exam(c, rs.getDate("e.date"));
                 result.add(e);
             }
