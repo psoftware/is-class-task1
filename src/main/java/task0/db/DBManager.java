@@ -27,7 +27,7 @@ public class DBManager {
     
     private Connection conn;
     
-    public DBManager (String address, int port, String DBName, String user, String password) {
+    public DBManager (String address, int port, String DBName, String user, String password) throws SQLException {
         this.DBName = DBName;
         this.port = port;
         this.password = password;
@@ -37,7 +37,7 @@ public class DBManager {
         connect();
     }
 
-    public static DBManager getInstance() {
+    public static DBManager getInstance() throws SQLException {
         if(INSTANCE == null) {
             INSTANCE = new DBManager("127.0.0.1", 3306, "Task0", "root", "root");
             INSTANCE.connect();
@@ -45,29 +45,25 @@ public class DBManager {
         return INSTANCE;
     }
     
-    public void connect () {
+    public void connect () throws SQLException {
         try {
             String url = "jdbc:mysql://" + address + ":" + Integer.toString(port) + "/" + DBName + "?&serverTimezone=UTC";
             System.out.println(url);
             conn = DriverManager.getConnection(url, user, password);
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());
+            TriggerSQLException.handleSqlException(ex);
         }        
     }
     
-    public void disconnect () {
+    public void disconnect () throws SQLException {
         try {
             conn.close();
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());
+            TriggerSQLException.handleSqlException(ex);
         }
     }
     
-    public ArrayList<Course> findCourse (int profID) {
+    public ArrayList<Course> findCourse (int profID) throws SQLException {
         ArrayList<Course> result = null;
         try {
             String sql = "SELECT c.*, pr.* FROM course c INNER JOIN professor pr ON pr.id = professor WHERE professor = ?";
@@ -82,14 +78,12 @@ public class DBManager {
                 result.add(c);
             }
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());           
+            TriggerSQLException.handleSqlException(ex);
         }
         return result;
     }
     
-    public void insertExam (int courseID, LocalDate date) throws TriggerSQLException {
+    public void insertExam (int courseID, LocalDate date) throws SQLException {
         try {
             String sql = "INSERT INTO exam (course, date) VALUES(?, ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -97,14 +91,11 @@ public class DBManager {
             pstmt.setDate(2, Date.valueOf(date)); //imposta la data a un giorno precedente
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());
-           TriggerSQLException.ifFromTrigger(ex);
+            TriggerSQLException.handleSqlException(ex);
         }
     }
     
-    public ArrayList<Registration> findRegistrationProfessor (int id) {
+    public ArrayList<Registration> findRegistrationProfessor (int id) throws SQLException {
         ArrayList<Registration> result = null;
         try {
             String sql = "SELECT c.*, e.*, s.*, pr.* FROM exam_result e " +
@@ -127,14 +118,12 @@ public class DBManager {
                 result.add(reg);
             }
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());            
+            TriggerSQLException.handleSqlException(ex);
         }
         return result;
     }
     
-    public ArrayList<Registration> findRegistrationStudent (int id, boolean toDo) {
+    public ArrayList<Registration> findRegistrationStudent (int id, boolean toDo) throws SQLException {
         ArrayList<Registration> result = null;
         try {
             String sql = "SELECT c.*, e.*, s.*, pr.* FROM exam_result e " +
@@ -161,14 +150,12 @@ public class DBManager {
                 result.add(reg);
             }
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());            
+            TriggerSQLException.handleSqlException(ex);
         }
         return result;
     }
-    
-    public void updateRegistration (Registration reg, int grade) throws TriggerSQLException {
+
+    public void updateRegistration (Registration reg, int grade) throws SQLException {
         try {
             String sql = "UPDATE exam_result SET grade = ? WHERE (student = ?) and (course = ?) and (date = ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -178,14 +165,11 @@ public class DBManager {
             pstmt.setDate(4, reg.getExam().getDate());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());
-           TriggerSQLException.ifFromTrigger(ex);
+            TriggerSQLException.handleSqlException(ex);
         }
     }
-    
-    public void deleteRegistration (int studentId, Exam exam) {
+
+    public void deleteRegistration (int studentId, Exam exam) throws SQLException {
         try {
             String sql = "DELETE FROM exam_result WHERE (student = ?) and (course = ?) and (date = ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -194,13 +178,11 @@ public class DBManager {
             pstmt.setDate(3, exam.getDate());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());
+            TriggerSQLException.handleSqlException(ex);
         }
     }
     
-    public ArrayList<Exam> findExam () {
+    public ArrayList<Exam> findExam () throws SQLException {
         ArrayList<Exam> result = null;
         try {
             String sql = "SELECT c.*, e.date, pr.* FROM exam e " +
@@ -217,14 +199,12 @@ public class DBManager {
                 result.add(e);
             }
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());
+            TriggerSQLException.handleSqlException(ex);
         }
         return result;
     }
-    
-    public void insertRegistration (int studentId, Exam exam, @Nullable Integer grade) throws TriggerSQLException {
+
+    public void insertRegistration (int studentId, Exam exam, @Nullable Integer grade) throws SQLException {
         try {
             String sql = "INSERT INTO exam_result (student, course, date, grade) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -237,22 +217,33 @@ public class DBManager {
                 pstmt.setInt(4, grade);
             pstmt.executeUpdate();
         } catch (SQLException ex) {
-           System.out.println("SQLException: " + ex.getMessage());
-           System.out.println("SQLState: " + ex.getSQLState());
-           System.out.println("VendorError: " + ex.getErrorCode());
-           TriggerSQLException.ifFromTrigger(ex);
+            TriggerSQLException.handleSqlException(ex);
         }
     }
 
-    public static class TriggerSQLException extends Exception{
-        public TriggerSQLException(String errString) {
-            super(errString);
+    public static class TriggerSQLException extends SQLException {
+        private String error;
+        private TriggerSQLException(SQLException sqlEx) {
+            super(new SQLException(sqlEx));
+            this.error = sqlEx.getMessage();
         }
 
-        public static void ifFromTrigger(SQLException ex) throws TriggerSQLException{
+        public String getTriggerMessage() {
+            return error;
+        }
+
+        public static void ifFromTrigger(SQLException ex) throws SQLException {
             if(ex.getSQLState().equals("02000")) {
-                throw new TriggerSQLException(ex.getMessage());
-            }
+                throw new TriggerSQLException(ex);
+            } else
+                throw ex;
+        }
+
+        protected static void handleSqlException(SQLException ex) throws SQLException {
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+            TriggerSQLException.ifFromTrigger(ex);
         }
     }
 }
