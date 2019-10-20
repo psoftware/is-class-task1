@@ -107,7 +107,7 @@ public class DBManager {
     public ArrayList<Registration> findRegistrationProfessor (int id) {
         ArrayList<Registration> result = null;
         try {
-            String sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, s.name, s.surname, pr.id, pr.name, pr.surname FROM exam_result e " +
+            String sql = "SELECT c.*, e.*, s.*, pr.* FROM exam_result e " +
                     "INNER JOIN course c ON c.id = e.course " +
                     "INNER JOIN student s ON s.id = e.student " +
                     "INNER JOIN exam ex ON ex.course = c.id " +
@@ -119,7 +119,7 @@ public class DBManager {
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Registration>();
             while (rs.next()) {
-                Student student = new Student(rs.getInt("student"), rs.getString("s.name"), rs.getString("s.surname"));
+                Student student = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
                 Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
                 Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam exam = new Exam(course, rs.getDate("date"));
@@ -137,8 +137,7 @@ public class DBManager {
     public ArrayList<Registration> findRegistrationStudent (int id, boolean toDo) {
         ArrayList<Registration> result = null;
         try {
-            String sql = "SELECT c.id, c.name, c.cfu, c.professor, student, e.date, e.grade, " +
-                    "s.name, s.surname, pr.id, pr.name, pr.surname FROM exam_result e " +
+            String sql = "SELECT c.*, e.*, s.*, pr.* FROM exam_result e " +
                     "INNER JOIN course c ON c.id = e.course " +
                     "INNER JOIN student s ON s.id = e.student " +
                     "INNER JOIN professor pr ON pr.id = c.professor " +
@@ -154,7 +153,7 @@ public class DBManager {
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Registration>();
             while (rs.next()) {
-                Student student = new Student(rs.getInt("student"), rs.getString("s.name"), rs.getString("s.surname"));
+                Student student = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
                 Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
                 Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam exam = new Exam(course, rs.getDate("date"));
@@ -204,7 +203,7 @@ public class DBManager {
     public ArrayList<Exam> findExam () {
         ArrayList<Exam> result = null;
         try {
-            String sql = "SELECT c.id, c.name, c.cfu, c.professor, course, e.date, pr.* FROM exam e " +
+            String sql = "SELECT c.*, e.date, pr.* FROM exam e " +
                     "INNER JOIN course c ON c.id = e.course " +
                     "INNER JOIN professor pr ON pr.id = c.professor; ";
             PreparedStatement pstmt = conn.prepareStatement(sql);
