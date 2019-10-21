@@ -136,11 +136,12 @@ public class Task0GUI {
                             exam -> {
                                 try {
                                     DBManager.getInstance().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
+                                    table.update(DBManager.getInstance().findExam(formId));
                                 } catch (SQLException e) {
                                     showError(e);
                                 }
                             });
-                    table.update(DBManager.getInstance().findExam());
+                    table.update(DBManager.getInstance().findExam(formId));
                 } else if (action.equals("Deregister to Exam")) {
                     table.setTableExamResults("Deregister", false,
                             reg -> {
