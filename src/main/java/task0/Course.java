@@ -13,9 +13,9 @@ public class Course {
     private int id;
     private String name;
     private int cfu;
-    private int professor;
+    private Professor professor;
     
-    public Course (int id, String name, int cfu, int professor){
+    public Course (int id, String name, int cfu, Professor professor){
         this.id = id;
         this.name = name;
         this.cfu = cfu;
@@ -34,5 +34,5 @@ public class Course {
         return cfu;
     }
 
-    public int getProfessor() { return professor; }
+    public Professor getProfessor() { return professor; }
 }

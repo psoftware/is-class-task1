@@ -122,7 +122,7 @@ public class Task0GUI {
                             reg -> {
                                 int mark = SimpleDialog.MarkDialog.showDialog();
                                 try {
-                                    DBManager.getInstance().updateRegistration(reg.getStudentID(), reg.getDate(), reg.getCourseID(), mark);
+                                    DBManager.getInstance().updateRegistration(reg, mark);
                                     table.update(DBManager.getInstance().findRegistrationProfessor(formId));
                                 } catch (SQLException e) {
                                     showError(e);
@@ -135,18 +135,17 @@ public class Task0GUI {
                     table.setTableExams("Register",
                             exam -> {
                                 try {
-                                    DBManager.getInstance().insertRegistration(formId, exam.getCourseID(), exam.getDate(), null);
-                                    table.update(DBManager.getInstance().findExam(formId));
+                                    DBManager.getInstance().insertRegistration(formId, exam, null);
                                 } catch (SQLException e) {
                                     showError(e);
                                 }
                             });
-                    table.update(DBManager.getInstance().findExam(formId));
+                    table.update(DBManager.getInstance().findExam());
                 } else if (action.equals("Deregister to Exam")) {
                     table.setTableExamResults("Deregister", false,
                             reg -> {
                                 try {
-                                    DBManager.getInstance().deleteRegistration(formId, reg.getCourseID(), reg.getDate());
+                                    DBManager.getInstance().deleteRegistration(formId, reg.getExam());
                                     table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
                                 } catch (SQLException e) {
                                     showError(e);

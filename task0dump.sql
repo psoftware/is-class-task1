@@ -15,7 +15,9 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-SET SQL_SAFE_UPDATE = 0;
+DROP SCHEMA IF EXISTS Task0;
+CREATE SCHEMA Task0;
+USE Task0;
 
 --
 -- Table structure for table `course`
@@ -256,6 +258,7 @@ DELIMITER ;;
 /*!50003 SET @saved_time_zone      = @@time_zone */ ;;
 /*!50003 SET time_zone             = 'SYSTEM' */ ;;
 /*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `checkFutureRegistrations` ON SCHEDULE EVERY 24 HOUR STARTS '2019-10-20 17:03:15' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+		SET SQL_SAFE_UPDATES = 0;
 		DELETE 
 		FROM exam_result e
         WHERE EXISTS 	(SELECT *
