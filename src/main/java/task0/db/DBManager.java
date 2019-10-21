@@ -66,14 +66,15 @@ public class DBManager {
     public ArrayList<Course> findCourse (int profID) throws SQLException {
         ArrayList<Course> result = null;
         try {
-            String sql = "SELECT * FROM course WHERE professor = ?";
+            String sql = "SELECT c.*, pr.* FROM course c INNER JOIN professor pr ON pr.id = professor WHERE professor = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, profID);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Course>();
             while (rs.next()){
-                Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"), rs.getInt("professor"));
+                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+                Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"), professor);
                 result.add(c);
             }
         } catch (SQLException ex) {
@@ -97,14 +98,23 @@ public class DBManager {
     public ArrayList<Registration> findRegistrationProfessor (int id) throws SQLException {
         ArrayList<Registration> result = null;
         try {
-            String sql = "SELECT course, name, cfu, student, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE c.professor = ?";
+            String sql = "SELECT c.*, e.*, s.*, pr.* FROM exam_result e " +
+                    "INNER JOIN course c ON c.id = e.course " +
+                    "INNER JOIN student s ON s.id = e.student " +
+                    "INNER JOIN exam ex ON ex.course = c.id " +
+                    "INNER JOIN professor pr ON pr.id = c.professor " +
+                    "WHERE c.professor = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Registration>();
             while (rs.next()) {
-                Registration reg = new Registration(rs.getInt("student"), rs.getString("name"), rs.getInt("course"), rs.getDate("date"), rs.getInt("grade"));
+                Student student = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
+                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
+                Exam exam = new Exam(course, rs.getDate("date"));
+                Registration reg = new Registration(student, exam, rs.getInt("grade"));
                 result.add(reg);
             }
         } catch (SQLException ex) {
@@ -116,19 +126,27 @@ public class DBManager {
     public ArrayList<Registration> findRegistrationStudent (int id, boolean toDo) throws SQLException {
         ArrayList<Registration> result = null;
         try {
-            String sql;
-            if (toDo) {
-                sql = "SELECT course, name, cfu, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE e.student = ? AND grade is NULL";
-            } else {
-                sql = "SELECT course, name, cfu, date, grade FROM exam_result e INNER JOIN course c ON c.id = e.course WHERE e.student = ? AND grade is not NULL";
-            }
+            String sql = "SELECT c.*, e.*, s.*, pr.* FROM exam_result e " +
+                    "INNER JOIN course c ON c.id = e.course " +
+                    "INNER JOIN student s ON s.id = e.student " +
+                    "INNER JOIN professor pr ON pr.id = c.professor " +
+                    "INNER JOIN exam ex ON ex.course = c.id ";
+            if (toDo)
+                sql += "WHERE e.student = ? AND grade is NULL";
+            else
+                sql += "WHERE e.student = ? AND grade is not NULL";
+
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Registration>();
             while (rs.next()) {
-                Registration reg = new Registration(id, rs.getString("name"), rs.getInt("course"), rs.getDate("date"), rs.getInt("grade"));
+                Student student = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
+                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
+                Exam exam = new Exam(course, rs.getDate("date"));
+                Registration reg = new Registration(student, exam, rs.getInt("grade"));
                 result.add(reg);
             }
         } catch (SQLException ex) {
@@ -136,28 +154,28 @@ public class DBManager {
         }
         return result;
     }
-    
-    public void updateRegistration (int student, Date date, int course, int grade) throws SQLException {
+
+    public void updateRegistration (Registration reg, int grade) throws SQLException {
         try {
             String sql = "UPDATE exam_result SET grade = ? WHERE (student = ?) and (course = ?) and (date = ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, grade);
-            pstmt.setInt(2, student);
-            pstmt.setInt(3, course);
-            pstmt.setDate(4, date);
+            pstmt.setInt(2, reg.getStudent().getId());
+            pstmt.setInt(3, reg.getExam().getCourse().getId());
+            pstmt.setDate(4, reg.getExam().getDate());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
             TriggerSQLException.handleSqlException(ex);
         }
     }
-    
-    public void deleteRegistration (int student, int course, Date date) throws SQLException {
+
+    public void deleteRegistration (int studentId, Exam exam) throws SQLException {
         try {
             String sql = "DELETE FROM exam_result WHERE (student = ?) and (course = ?) and (date = ?);";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, student);
-            pstmt.setInt(2, course);
-            pstmt.setDate(3, date);
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, exam.getCourse().getId());
+            pstmt.setDate(3, exam.getDate());
             pstmt.executeUpdate();
         } catch (SQLException ex) {
             TriggerSQLException.handleSqlException(ex);
@@ -167,13 +185,17 @@ public class DBManager {
     public ArrayList<Exam> findExam () throws SQLException {
         ArrayList<Exam> result = null;
         try {
-            String sql = "SELECT course, date, name FROM exam e INNER JOIN course c ON c.id = e.course";
+            String sql = "SELECT c.*, e.date, pr.* FROM exam e " +
+                    "INNER JOIN course c ON c.id = e.course " +
+                    "INNER JOIN professor pr ON pr.id = c.professor; ";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<>();
             while (rs.next()) {
-                Exam e = new Exam(rs.getDate("date"), rs.getInt("course"), rs.getString("name"));
+                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+                Course c = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
+                Exam e = new Exam(c, rs.getDate("e.date"));
                 result.add(e);
             }
         } catch (SQLException ex) {
@@ -181,14 +203,14 @@ public class DBManager {
         }
         return result;
     }
-    
-    public void insertRegistration (int student, int course, Date date, @Nullable Integer grade) throws SQLException {
+
+    public void insertRegistration (int studentId, Exam exam, @Nullable Integer grade) throws SQLException {
         try {
             String sql = "INSERT INTO exam_result (student, course, date, grade) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, student);
-            pstmt.setInt(2, course);
-            pstmt.setDate(3, date);
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, exam.getCourse().getId());
+            pstmt.setDate(3, exam.getDate());
             if(grade == null)
                 pstmt.setNull(4, Types.INTEGER);
             else

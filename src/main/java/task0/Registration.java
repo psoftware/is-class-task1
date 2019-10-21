@@ -12,37 +12,24 @@ import java.sql.Date;
  * @author cacomop
  */
 public class Registration {
-    private int studentID;
-    private String course;
-    private int courseID;
-    private Date date;
     private int grade;
+
+    private Student student;
+    private Exam exam;
     
-    public Registration (int studentID, String course, int courseID, Date date, int grade) {
-        this.course = course;
-        this.date = date;
+    public Registration (Student student, Exam exam, int grade) {
+        this.exam = exam;
         this.grade = grade;
-        this.courseID = courseID;
-        this.studentID = studentID;
+        this.student = student;
     }
-    
-    public String getCourse() {
-        return course;
+
+    public Exam getExam() {
+        return exam;
     }
-    
-    public Date getDate() {
-        return date;
-    }
-    
     public int getGrade() {
         return grade;
     }
-    
-    public int getStudentID () {
-        return studentID;
-    }
-    
-    public int getCourseID () {
-        return courseID;
+    public Student getStudent () {
+        return student;
     }
 }
