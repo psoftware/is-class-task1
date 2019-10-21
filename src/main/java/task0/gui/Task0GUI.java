@@ -163,15 +163,16 @@ public class Task0GUI {
     };
 
     public void showError(Exception ex) {
-        String errString;
+        String errString = ex.getMessage();
 
-        //if(ex instanceof DBManager.TriggerSQLException)
-        //    errString = ((DBManager.TriggerSQLException)ex).getTriggerMessage();
-        //else
-        //    errString = "SQLException: " + ex.getMessage() +
-        //            "\nSQLState: " + ex.getSQLState() +
-        //            "\nVendorError: " + ex.getErrorCode();
-        SimpleDialog.showErrorDialog(ex.getMessage());
+        // Navigate exceptions callback to get the SQLException
+        Exception e = ex;
+        while(e != null && !(e instanceof SQLException))
+            e = (Exception)e.getCause();
+
+        if(e != null)
+            errString = ((SQLException)e).getMessage();
+        SimpleDialog.showErrorDialog(errString);
     }
 
     public VBox getOuterVbox(){return outerVbox;}
