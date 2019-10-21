@@ -49,7 +49,7 @@ public class DBManager {
         for(Course c : manager.findCourse(1))
             System.out.println("Course ("+c.getCfu()+")" + c.getName() + " of Professor " + c.getProfessor().getName() + " " + c.getProfessor().getSurname());
 
-        for(Exam e : manager.findExam())
+        for(Exam e : manager.findExam(1))
             System.out.println(e.getId().getDate() + " " + e.getCourse().getName());
 
         for(Registration r : manager.findRegistrationProfessor(1))
@@ -80,11 +80,15 @@ public class DBManager {
         return resultList;
     }
 
-    public List<Exam> findExam() {
+    public List<Exam> findExam(int studId) {
         List<Exam> resultList;
         try {
             entityManager = factory.createEntityManager();
-            Query query = entityManager.createQuery("SELECT e FROM Exam e");
+            Query query = entityManager.createQuery("SELECT e FROM Exam e WHERE (" +
+                    "SELECT count(r) FROM Registration r " +
+                    "WHERE r.student.id = :studId AND r.exam.id = e.id OR (r.exam.course = e.course AND r.grade IS NOT NULL) " +
+                    ") = 0");
+            query.setParameter("studId", studId);
             resultList = query.getResultList();
         } catch (Exception ex) {
             throw ex;
