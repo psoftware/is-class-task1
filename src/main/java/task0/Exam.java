@@ -81,5 +81,6 @@ public class Exam {
     public Exam() {}
     public Exam(Course course, Date date) {
         this.id = new ExamID(date, course.getId());
+        this.course = course;
     }
 }

@@ -112,7 +112,7 @@ public class Task0GUI {
                                 LocalDate newdate = SimpleDialog.DateDialog.showDialog();
                                 try {
                                     DBManager.getInstance().insertExam(course.getId(), newdate);
-                                } catch (SQLException e) {
+                                } catch (Exception e) {
                                     showError(e);
                                 }
                             });
@@ -124,7 +124,7 @@ public class Task0GUI {
                                 try {
                                     DBManager.getInstance().updateRegistration(reg, mark);
                                     table.update(DBManager.getInstance().findRegistrationProfessor(formId));
-                                } catch (SQLException e) {
+                                } catch (Exception e) {
                                     showError(e);
                                 }
                             });
@@ -136,7 +136,7 @@ public class Task0GUI {
                             exam -> {
                                 try {
                                     DBManager.getInstance().insertRegistration(formId, exam, null);
-                                } catch (SQLException e) {
+                                } catch (Exception e) {
                                     showError(e);
                                 }
                             });
@@ -147,7 +147,7 @@ public class Task0GUI {
                                 try {
                                     DBManager.getInstance().deleteRegistration(formId, reg.getExam());
                                     table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
-                                } catch (SQLException e) {
+                                } catch (Exception e) {
                                     showError(e);
                                 }
                             });
@@ -157,21 +157,21 @@ public class Task0GUI {
                     table.update(DBManager.getInstance().findRegistrationStudent(formId, false));
                 }
             }
-        } catch(SQLException ex) {
+        } catch(Exception ex) {
             showError(ex);
         }
     };
 
-    public void showError(SQLException ex) {
+    public void showError(Exception ex) {
         String errString;
 
-        if(ex instanceof DBManager.TriggerSQLException)
-            errString = ((DBManager.TriggerSQLException)ex).getTriggerMessage();
-        else
-            errString = "SQLException: " + ex.getMessage() +
-                    "\nSQLState: " + ex.getSQLState() +
-                    "\nVendorError: " + ex.getErrorCode();
-        SimpleDialog.showErrorDialog(errString);
+        //if(ex instanceof DBManager.TriggerSQLException)
+        //    errString = ((DBManager.TriggerSQLException)ex).getTriggerMessage();
+        //else
+        //    errString = "SQLException: " + ex.getMessage() +
+        //            "\nSQLState: " + ex.getSQLState() +
+        //            "\nVendorError: " + ex.getErrorCode();
+        SimpleDialog.showErrorDialog(ex.getMessage());
     }
 
     public VBox getOuterVbox(){return outerVbox;}
