@@ -182,13 +182,21 @@ public class DBManager {
         }
     }
     
-    public ArrayList<Exam> findExam () throws SQLException {
+    public ArrayList<Exam> findExam (int studentId) throws SQLException {
         ArrayList<Exam> result = null;
         try {
-            String sql = "SELECT c.*, e.date, pr.* FROM exam e " +
-                    "INNER JOIN course c ON c.id = e.course " +
-                    "INNER JOIN professor pr ON pr.id = c.professor; ";
+            String sql = "SELECT e.course, e.date, c.*, pr.* " +
+                    "FROM exam e INNER JOIN course c ON c.id = e.course INNER JOIN professor pr ON pr.id = c.professor " +
+                    "WHERE NOT EXISTS( SELECT * " +
+                    "FROM exam_result er " +
+                    "WHERE er.student = ? and " +
+                    "       (er.course = e.course " +
+                    "       AND er.date = e.date) " +
+                    "   OR " +
+                    "       (er.course = e.course " +
+                    "       AND er.grade IS NOT NULL));";
             PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, studentId);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<>();
