@@ -112,6 +112,7 @@ public class Task0GUI {
                                 LocalDate newdate = SimpleDialog.DateDialog.showDialog();
                                 try {
                                     DBManager.getInstance().insertExam(course.getId(), newdate);
+                                    SimpleDialog.showConfirmDialog("Exam added successfully");
                                 } catch (Exception e) {
                                     showError(e);
                                 }
@@ -124,6 +125,7 @@ public class Task0GUI {
                                 try {
                                     DBManager.getInstance().updateRegistration(reg, mark);
                                     table.update(DBManager.getInstance().findRegistrationProfessor(formId));
+                                    SimpleDialog.showConfirmDialog("Mark added successfully");
                                 } catch (Exception e) {
                                     showError(e);
                                 }
