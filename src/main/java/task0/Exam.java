@@ -20,12 +20,12 @@ public class Exam {
     @Embeddable
     public static class ExamID implements Serializable {
         private Date date;
-        private int courseId;
+        private int course;
 
         public ExamID() {}
-        public ExamID(Date date, int courseId) {
+        public ExamID(Date date, int course) {
             this.date = date;
-            this.courseId = courseId;
+            this.course = course;
         }
 
         public Date getDate() {
@@ -35,11 +35,11 @@ public class Exam {
             this.date = date;
         }
 
-        public int getCourseId() {
-            return courseId;
+        public int getCourse() {
+            return course;
         }
-        public void setCourseId(int courseId) {
-            this.courseId = courseId;
+        public void setCourse(int course) {
+            this.course = course;
         }
 
         @Override
@@ -48,7 +48,7 @@ public class Exam {
                 return false;
 
             ExamID examobj = (ExamID)obj;
-            return getDate().equals(examobj.date) && courseId == examobj.getCourseId();
+            return getDate().equals(examobj.date) && course == examobj.getCourse();
         }
 
         //TODO: implement hashcode (is it really necessary?)
@@ -70,7 +70,7 @@ public class Exam {
     // ===== Chiave =====
     private Course course;
 
-    @MapsId("courseId") // TODO: verificare correttezza
+    @MapsId("course") // TODO: verificare correttezza
     @JoinColumn(name="course", referencedColumnName="id")
     @ManyToOne
     public Course getCourse() {

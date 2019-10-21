@@ -34,15 +34,45 @@ public class DBManager {
         factory.close();
     }
 
-    public List readRegistrationForStudent(int studentId) {
+    public static void main(String[] args) {
+        DBManager manager = new DBManager();
+        manager.setup();
+
+        System.out.println("readRegistrationForStudent(1)");
+
+        for(Registration r : manager.readRegistrationForStudent(1))
+            System.out.println(r.getExam().getId().getDate().toString() + " " + r.getExam().getCourse().getName() + ": " + r.getGrade());
+
+        //for(Course c : manager.findCourse(1))
+        //    System.out.println("Course ("+c.getCfu()+")" + c.getName() + " of Professor " + c.getProfessor().getName() + " " + c.getProfessor().getSurname());
+
+        manager.exit();
+        System.out.println("Finished");
+    }
+
+    public List<Registration> readRegistrationForStudent(int studentId) {
         List<Registration> resultList;
         try {
             entityManager = factory.createEntityManager();
             Query query = entityManager.createQuery("SELECT r FROM Registration r WHERE r.student.id = :studentId");
             query.setParameter("studentId", studentId);
             resultList = query.getResultList();
-            for(Registration r : resultList)
-                System.out.println(r.getExam().getId().getDate().toString() + " " + r.getExam().getCourse().getName() + ": " + r.getGrade());
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            entityManager.close();
+        }
+
+        return resultList;
+    }
+
+    public List<Course> findCourse(int profID) {
+        List<Course> resultList;
+        try {
+            entityManager = factory.createEntityManager();
+            Query query = entityManager.createQuery("SELECT c FROM Course c WHERE c.professor.id = :profID");
+            query.setParameter("profID", profID);
+            resultList = query.getResultList();
         } catch (Exception ex) {
             throw ex;
         } finally {
@@ -79,86 +109,7 @@ public class DBManager {
         }
     }
 
-    public static void main(String[] args) {
-        DBManager manager = new DBManager();
-        manager.setup();
-
-        System.out.println("readRegistrationForStudent(1)");
-        manager.readRegistrationForStudent(1);
-        System.out.println("readRegistrationForStudent(2)");
-        manager.readRegistrationForStudent(2);
-
-
-        manager.exit();
-        System.out.println("Finished");
-    }
     /*
-    private static DBManager INSTANCE;
-
-    private String address;
-    private int port;
-    private String DBName;
-    private String user;
-    private String password;
-    
-    private Connection conn;
-    
-    public DBManager (String address, int port, String DBName, String user, String password) throws SQLException {
-        this.DBName = DBName;
-        this.port = port;
-        this.password = password;
-        this.user = user;
-        this.address = address;
-        
-        connect();
-    }
-
-    public static DBManager getInstance() throws SQLException {
-        if(INSTANCE == null) {
-            INSTANCE = new DBManager("127.0.0.1", 3306, "Task0", "root", "root");
-            INSTANCE.connect();
-        }
-        return INSTANCE;
-    }
-    
-    public void connect () throws SQLException {
-        try {
-            String url = "jdbc:mysql://" + address + ":" + Integer.toString(port) + "/" + DBName + "?&serverTimezone=UTC";
-            System.out.println(url);
-            conn = DriverManager.getConnection(url, user, password);
-        } catch (SQLException ex) {
-            TriggerSQLException.handleSqlException(ex);
-        }        
-    }
-    
-    public void disconnect () throws SQLException {
-        try {
-            conn.close();
-        } catch (SQLException ex) {
-            TriggerSQLException.handleSqlException(ex);
-        }
-    }
-    
-    public ArrayList<Course> findCourse (int profID) throws SQLException {
-        ArrayList<Course> result = null;
-        try {
-            String sql = "SELECT c.*, pr.* FROM course c INNER JOIN professor pr ON pr.id = professor WHERE professor = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, profID);
-            pstmt.execute();
-            ResultSet rs = pstmt.getResultSet();
-            result = new ArrayList<Course>();
-            while (rs.next()){
-                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
-                Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"), professor);
-                result.add(c);
-            }
-        } catch (SQLException ex) {
-            TriggerSQLException.handleSqlException(ex);
-        }
-        return result;
-    }
-    
     public void insertExam (int courseID, LocalDate date) throws SQLException {
         try {
             String sql = "INSERT INTO exam (course, date) VALUES(?, ?);";

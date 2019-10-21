@@ -58,6 +58,7 @@ public class Course {
     }
 
     @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name="professor", referencedColumnName = "id")
     public Professor getProfessor() { return professor; }
 
     public void setProfessor(Professor professor) {

@@ -19,22 +19,22 @@ public class Registration {
 
     @Embeddable
     public static class RegistrationId implements Serializable {
-        private int studentId;
+        private int student;
         private Exam.ExamID exam;
 
         public RegistrationId() {}
 
-        public int getStudentId() {
-            return studentId;
+        public int getStudent() {
+            return student;
         }
-        public void setStudentId(int studentId) {
-            this.studentId = studentId;
+        public void setStudent(int student) {
+            this.student = student;
         }
 
-        public Exam.ExamID getExamId() {
+        public Exam.ExamID getExam() {
             return this.exam;
         }
-        public void setExamId(Exam.ExamID exam) {
+        public void setExam(Exam.ExamID exam) {
             this.exam = exam;
         }
 
@@ -44,7 +44,7 @@ public class Registration {
                 return false;
 
             RegistrationId regobj = (RegistrationId)obj;
-            return studentId == regobj.getStudentId() && exam.equals(regobj.getExamId());
+            return student == regobj.getStudent() && exam.equals(regobj.getExam());
         }
 
         //TODO: implement hashcode (is it really necessary?)
@@ -78,7 +78,7 @@ public class Registration {
     // ===== Key fields =====
     private Student student;
 
-    @MapsId("studentId") // TODO: verificare correttezza
+    @MapsId("student") // TODO: verificare correttezza
     @JoinColumn(name="student", referencedColumnName="id")
     @ManyToOne
     public Student getStudent () {
@@ -91,7 +91,7 @@ public class Registration {
 
     private Exam exam;
 
-    @MapsId("examId") // TODO: verificare correttezza
+    @MapsId("exam") // TODO: verificare correttezza
     // il join tra Registration e Exam va fatto su due campi contemporaneamente:
     // exam_result.course = exam.course AND exam_result.date = exam.date
     @JoinColumns({
