@@ -31,7 +31,6 @@ public class Exam {
         public Date getDate() {
             return date;
         }
-
         public void setDate(Date date) {
             this.date = date;
         }
@@ -39,12 +38,10 @@ public class Exam {
         public int getCourseId() {
             return courseId;
         }
-
         public void setCourseId(int courseId) {
             this.courseId = courseId;
         }
 
-        //TODO: implement hash and equals (is it really necessary?)
         @Override
         public boolean equals(Object obj) {
             if(obj == null || obj.getClass() != this.getClass())
@@ -53,35 +50,36 @@ public class Exam {
             ExamID examobj = (ExamID)obj;
             return getDate().equals(examobj.date) && courseId == examobj.getCourseId();
         }
+
+        //TODO: implement hashcode (is it really necessary?)
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
     }
 
-    @EmbeddedId private ExamID id;
-
-    public Exam() {}
-    /*public Exam(Course course, Date date) {
-        this.id = new ExamID(date, course);
-        this.id.setDate(date);
-        this.id.setCourse(course);
-    }*/
+    private ExamID id;
+    @EmbeddedId
+    public ExamID getId() {
+        return id;
+    }
+    public void setId(ExamID id) {
+        this.id = id;
+    }
 
     // ===== Chiave =====
     private Course course;
 
     @MapsId("courseId") // TODO: verificare correttezza
     @JoinColumn(name="course", referencedColumnName="id")
-    @ManyToOne(targetEntity = Course.class)
+    @ManyToOne
     public Course getCourse() {
         return course;
     }
     public void setCourse(Course course) { this.course = course;}
 
-
-    // ===== Date =====
-    private Date date;
-
-    @Column(name = "date")
-    public Date getDate() {
-        return date;
+    public Exam() {}
+    public Exam(Course course, Date date) {
+        this.id = new ExamID(date, course.getId());
     }
-    public void setDate(Date date) { this.date = date;} // TODO: perchè non è usato?
 }

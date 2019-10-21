@@ -27,7 +27,6 @@ public class Registration {
         public int getStudentId() {
             return studentId;
         }
-
         public void setStudentId(int studentId) {
             this.studentId = studentId;
         }
@@ -35,15 +34,28 @@ public class Registration {
         public Exam.ExamID getExamId() {
             return this.exam;
         }
-
-        public void setExamId(Exam.ExamID examId) {
+        public void setExamId(Exam.ExamID exam) {
             this.exam = exam;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj == null || obj.getClass() != this.getClass())
+                return false;
+
+            RegistrationId regobj = (RegistrationId)obj;
+            return studentId == regobj.getStudentId() && exam.equals(regobj.getExamId());
+        }
+
+        //TODO: implement hashcode (is it really necessary?)
+        @Override
+        public int hashCode() {
+            return super.hashCode();
         }
     }
 
 
-    @EmbeddedId
-    private RegistrationId id;
+
 
     public Registration () {}
 
@@ -54,6 +66,14 @@ public class Registration {
         this.id = new RegistrationId(student, exam);
     }*/
 
+    private RegistrationId id;
+    @EmbeddedId
+    public RegistrationId getId() {
+        return id;
+    }
+    public void setId(RegistrationId id) {
+        this.id = id;
+    }
 
     // ===== Key fields =====
     private Student student;
@@ -87,9 +107,12 @@ public class Registration {
     }
 
     // ===== Additional fields =====
-    private int grade;
+    private Integer grade;
     @Column(name = "grade")
-    public int getGrade() {
+    public Integer getGrade() {
         return grade;
+    }
+    public void setGrade(Integer grade) {
+        this.grade = grade;
     }
 }

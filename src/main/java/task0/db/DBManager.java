@@ -8,15 +8,91 @@ package main.java.task0.db;
 import com.sun.istack.internal.Nullable;
 import main.java.task0.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author adria
  */
 public class DBManager {
+    private EntityManagerFactory factory;
+    private EntityManager entityManager;
+
+    public void setup() {
+        factory = Persistence.createEntityManagerFactory("Task0");
+
+    }
+
+    public void exit() {
+        factory.close();
+    }
+
+    public List readRegistrationForStudent(int studentId) {
+        List<Registration> resultList;
+        try {
+            entityManager = factory.createEntityManager();
+            Query query = entityManager.createQuery("SELECT r FROM Registration r WHERE r.student.id = :studentId");
+            query.setParameter("studentId", studentId);
+            resultList = query.getResultList();
+            for(Registration r : resultList)
+                System.out.println(r.getExam().getId().getDate().toString() + " " + r.getExam().getCourse().getName() + ": " + r.getGrade());
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            entityManager.close();
+        }
+
+        return resultList;
+    }
+
+    public void insertRegistration(Exam exam, Student student) {
+        System.out.println("Creating a new Book");
+
+        Registration registration = new Registration();
+        registration.setExam(exam);
+        registration.setStudent(student);
+
+        try {
+            entityManager = factory.createEntityManager();
+            entityManager.getTransaction().begin();
+            // Insert
+            entityManager.persist(exam);
+            // Update
+            // entityManager.merge(exam);
+            // Delete
+            // entityManager.remove(exam);
+            entityManager.getTransaction().commit();
+            System.out.println("Registration Added");
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("A problem occurred inserting a registration!");
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    public static void main(String[] args) {
+        DBManager manager = new DBManager();
+        manager.setup();
+
+        System.out.println("readRegistrationForStudent(1)");
+        manager.readRegistrationForStudent(1);
+        System.out.println("readRegistrationForStudent(2)");
+        manager.readRegistrationForStudent(2);
+
+
+        manager.exit();
+        System.out.println("Finished");
+    }
+    /*
     private static DBManager INSTANCE;
 
     private String address;
@@ -246,4 +322,5 @@ public class DBManager {
             TriggerSQLException.ifFromTrigger(ex);
         }
     }
+     */
 }
