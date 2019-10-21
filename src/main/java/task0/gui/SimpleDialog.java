@@ -108,4 +108,13 @@ public abstract class SimpleDialog<T> extends Dialog<T> {
 
         alert.showAndWait();
     }
+
+    public static void showConfirmDialog(String info) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText("Operation completed successfully");
+        alert.setContentText(info);
+
+        alert.showAndWait();
+    }
 }
