@@ -171,6 +171,7 @@ public class DBManager {
             Query query = entityManager.createQuery("DELETE FROM Registration r WHERE r.exam = :exam AND r.student.id = :studId");
             query.setParameter("exam", exam);
             query.setParameter("studId", studentId);
+            query.executeUpdate();
             entityManager.getTransaction().commit();
         } catch (Exception ex) {
             ex.printStackTrace();
