@@ -156,6 +156,7 @@ public class DBManager {
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("A problem occurred inserting a registration!");
+            throw ex;
         } finally {
             entityManager.close();
         }
@@ -174,21 +175,20 @@ public class DBManager {
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("A problem occurred inserting a registration!");
+            throw ex;
         } finally {
             entityManager.close();
         }
     }
 
     // L'ho fatta io e non l'ho copiata dal codice commentato
-    public void insertRegistration(int studentId, Exam exam,  @Nullable Integer grade) {
+    public void insertRegistration(int studentId, Exam examDetached,  @Nullable Integer grade) {
         try {
             entityManager = factory.createEntityManager();
 
             Student student = entityManager.getReference(Student.class, studentId);
-            Registration registration = new Registration();
-            registration.setExam(exam);
-            registration.setStudent(student);
-            registration.setGrade(grade);
+            Exam exam = entityManager.getReference(Exam.class, examDetached.getId());
+            Registration registration = new Registration(student, exam, grade);
 
             entityManager.getTransaction().begin();
             entityManager.persist(registration);
@@ -196,6 +196,7 @@ public class DBManager {
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("A problem occurred inserting a registration!");
+            throw ex;
         } finally {
             entityManager.close();
         }

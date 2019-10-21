@@ -59,12 +59,14 @@ public class Registration {
 
     public Registration () {}
 
-    /*public Registration (Student student, Exam exam, int grade) {
+    public Registration (Student student, Exam exam, Integer grade) {
         this.exam = exam;
         this.grade = grade;
         this.student = student;
-        this.id = new RegistrationId(student, exam);
-    }*/
+        this.id = new RegistrationId();
+        this.id.setExam(exam.getId());
+        this.id.setStudent(student.getId());
+    }
 
     private RegistrationId id;
     @EmbeddedId
@@ -100,7 +102,7 @@ public class Registration {
     })
     @ManyToOne
     public Exam getExam() {
-        return exam;
+        return this.exam;
     }
     public void setExam(Exam exam) {
         this.exam = exam;
