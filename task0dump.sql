@@ -19,8 +19,6 @@ DROP SCHEMA IF EXISTS Task0;
 CREATE SCHEMA Task0;
 USE Task0;
 
-/*SET SQL_SAFE_UPDATE = 0;*/
-
 --
 -- Table structure for table `course`
 --
