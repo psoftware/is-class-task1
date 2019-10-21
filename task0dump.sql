@@ -258,6 +258,7 @@ DELIMITER ;;
 /*!50003 SET @saved_time_zone      = @@time_zone */ ;;
 /*!50003 SET time_zone             = 'SYSTEM' */ ;;
 /*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `checkFutureRegistrations` ON SCHEDULE EVERY 24 HOUR STARTS '2019-10-20 17:03:15' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+		SET SQL_SAFE_UPDATES = 0;
 		DELETE 
 		FROM exam_result e
         WHERE EXISTS 	(SELECT *
