@@ -5,14 +5,22 @@
  */
 package main.java.task0;
 
+import javax.persistence.*;
+
 /**
  *
  * @author adria
  */
+@Entity
+@Table(name = "student")
 public class Student {
     int id;
     String name;
     String surname;
+
+    public Student() {
+
+    }
 
     public Student(int id, String name, String surname) {
         this.id = id;
@@ -20,6 +28,9 @@ public class Student {
         this.surname = surname;
     }
 
+    @Column(name = "id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int getId() {
         return id;
     }

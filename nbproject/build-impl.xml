@@ -202,7 +202,7 @@ is divided into following sections:
         <property name="jar.index" value="false"/>
         <property name="jar.index.metainf" value="${jar.index}"/>
         <property name="copylibs.rebase" value="true"/>
-        <available file="${meta.inf.dir}/persistence.xml" property="has.persistence.xml"/>
+        <available file="../src/main/java/task0/META-INF/persistence.xml" property="has.persistence.xml"/>
         <condition property="junit.available">
             <or>
                 <available classname="org.junit.Test" classpath="${run.test.classpath}"/>

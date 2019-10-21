@@ -5,16 +5,24 @@
  */
 package main.java.task0;
 
+import javax.persistence.*;
+
 /**
  *
  * @author cacomop
  */
+@Entity
+@Table(name = "course")
 public class Course {
     private int id;
     private String name;
     private int cfu;
     private Professor professor;
-    
+
+    public Course() {
+
+    }
+
     public Course (int id, String name, int cfu, Professor professor){
         this.id = id;
         this.name = name;
@@ -22,17 +30,37 @@ public class Course {
         this.professor = professor;
     }
 
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int getId () {
         return id;
     }
-    
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName () {
         return name;
     }
-    
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public int getCfu () {
         return cfu;
     }
 
+    public void setCfu(int cfu) {
+        this.cfu = cfu;
+    }
+
+    @ManyToOne(cascade = {CascadeType.ALL})
     public Professor getProfessor() { return professor; }
+
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
 }
