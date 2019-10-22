@@ -1,0 +1,10 @@
+\contentsline {chapter}{List of Figures}{2}
+\contentsline {chapter}{Application Specifications}{2}
+\contentsline {chapter}{Requirements and Use Cases}{3}
+\contentsline {section}{Functional Requirements}{4}
+\contentsline {chapter}{Entity-Relationship Diagram}{5}
+\contentsline {section}{ER Vocabulary}{6}
+\contentsline {section}{ER Diagram}{7}
+\contentsline {chapter}{UML Class Diagram}{7}
+\contentsline {chapter}{User's Manual}{8}
+\contentsline {chapter}{Bibliography}{10}
