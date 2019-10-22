@@ -57,6 +57,14 @@ public class Table  extends TableView {
                 Callback<T, String> stringFun) {
             return column -> new ReadOnlyObjectWrapper<String>(stringFun.call(column.getValue()));
         }
+
+        public static <T> Callback<TableColumn.CellDataFeatures<T, String>, ObservableValue<String>> build(
+                Callback<T, String> stringFun, String onNull) {
+            return column -> {
+                String lamdaRes = stringFun.call(column.getValue());
+                return new ReadOnlyObjectWrapper<String>(lamdaRes!=null ? lamdaRes : onNull);
+            };
+        }
     }
     
     public void setTableExams(String actionName, @Nullable Consumer<Exam> callback){//02
