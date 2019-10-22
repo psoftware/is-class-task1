@@ -110,7 +110,8 @@ public class DBManager {
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Registration>();
             while (rs.next()) {
-                Student student = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
+                int studentId = rs.getInt("s.id");
+                Student.LazyStudent student = new Student.LazyStudent(() -> LevelDBManager.getInstance().getStudent(studentId));
                 Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
                 Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam exam = new Exam(course, rs.getDate("date"));
@@ -142,7 +143,8 @@ public class DBManager {
             ResultSet rs = pstmt.getResultSet();
             result = new ArrayList<Registration>();
             while (rs.next()) {
-                Student student = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
+                int studentId = rs.getInt("s.id");
+                Student.LazyStudent student = new Student.LazyStudent(() -> LevelDBManager.getInstance().getStudent(studentId));
                 Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
                 Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam exam = new Exam(course, rs.getDate("date"));

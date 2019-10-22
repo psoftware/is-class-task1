@@ -5,6 +5,8 @@
  */
 package main.java.task0;
 
+import java.util.function.Supplier;
+
 /**
  *
  * @author adria
@@ -13,6 +15,8 @@ public class Student {
     int id;
     String name;
     String surname;
+
+    public Student() {}
 
     public Student(int id, String name, String surname) {
         this.id = id;
@@ -42,5 +46,60 @@ public class Student {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public static class LazyStudent extends Student {
+        private Supplier<Student> suppl;
+        public LazyStudent(Supplier<Student> suppl) {
+            super();
+            this.suppl = suppl;
+        }
+
+        private void supplyIfNeeded() {
+            // Supply only first time
+            if(suppl != null) {
+                Student stud = suppl.get();
+                suppl = null;
+                this.setId(stud.getId());
+                this.setName(stud.getName());
+                this.setSurname(stud.getSurname());
+            }
+        }
+
+        @Override
+        public int getId() {
+            supplyIfNeeded();
+            return id;
+        }
+
+        @Override
+        public void setId(int id) {
+            supplyIfNeeded();
+            this.id = id;
+        }
+
+        @Override
+        public String getName() {
+            supplyIfNeeded();
+            return name;
+        }
+
+        @Override
+        public void setName(String name) {
+            supplyIfNeeded();
+            this.name = name;
+        }
+
+        @Override
+        public String getSurname() {
+            supplyIfNeeded();
+            return surname;
+        }
+
+        @Override
+        public void setSurname(String surname) {
+            supplyIfNeeded();
+            this.surname = surname;
+        }
     }
 }

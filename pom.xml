@@ -15,6 +15,14 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.18</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.iq80.leveldb/leveldb -->
+        <dependency>
+            <groupId>org.iq80.leveldb</groupId>
+            <artifactId>leveldb</artifactId>
+            <version>0.12</version>
+        </dependency>
+
     </dependencies>
 
     <build>

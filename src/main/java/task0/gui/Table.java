@@ -120,8 +120,12 @@ public class Table  extends TableView {
 
         if(showStudentId) {
             TableColumn student = new TableColumn("Student");
+            TableColumn studentName = new TableColumn("Student");
+            TableColumn studentSurname = new TableColumn("Student");
             student.setCellValueFactory(MappedTableColumn.<Registration>build(p -> Integer.toString(p.getStudent().getId())));
-            getColumns().add(student);
+            studentName.setCellValueFactory(MappedTableColumn.<Registration>build(p -> p.getStudent().getName(), ""));
+            studentSurname.setCellValueFactory(MappedTableColumn.<Registration>build(p -> p.getStudent().getName(), ""));
+            getColumns().addAll(student, studentName, studentSurname);
         }
 
         TableColumn course = new TableColumn("Course");
