@@ -11,7 +11,6 @@ import javafx.scene.text.FontWeight;
 
 import javafx.event.ActionEvent;
 import main.java.task0.Course;
-import main.java.task0.User;
 import main.java.task0.db.DBManager;
 
 import java.sql.Date;
