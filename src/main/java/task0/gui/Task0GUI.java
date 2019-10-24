@@ -11,6 +11,7 @@ import javafx.scene.text.FontWeight;
 
 import javafx.event.ActionEvent;
 import main.java.task0.Course;
+import main.java.task0.db.CompositeDBManager;
 import main.java.task0.db.DBManager;
 
 import java.sql.Date;
@@ -110,53 +111,53 @@ public class Task0GUI {
                             course -> {
                                 LocalDate newdate = SimpleDialog.DateDialog.showDialog();
                                 try {
-                                    DBManager.getInstance().insertExam(course.getId(), newdate);
+                                    CompositeDBManager.getInstance().insertExam(course.getId(), newdate);
                                     SimpleDialog.showConfirmDialog("Exam added successfully");
                                 } catch (SQLException e) {
                                     showError(e);
                                 }
                             });
-                    table.update(DBManager.getInstance().findCourse(formId));
+                    table.update(CompositeDBManager.getInstance().findCourse(formId));
                 } else if (action.equals("Add Grade")) {
                     table.setTableExamResults("Insert Mark", true,
                             reg -> {
                                 int mark = SimpleDialog.MarkDialog.showDialog();
                                 try {
-                                    DBManager.getInstance().updateRegistration(reg, mark);
-                                    table.update(DBManager.getInstance().findRegistrationProfessor(formId));
+                                    CompositeDBManager.getInstance().updateRegistration(reg, mark);
+                                    table.update(CompositeDBManager.getInstance().findRegistrationProfessor(formId));
                                     SimpleDialog.showConfirmDialog("Mark added successfully");
                                 } catch (SQLException e) {
                                     showError(e);
                                 }
                             });
-                    table.update(DBManager.getInstance().findRegistrationProfessor(formId));
+                    table.update(CompositeDBManager.getInstance().findRegistrationProfessor(formId));
                 }
             } else if (role.equals("Student")) {
                 if (action.equals("Register to Exam")) {
                     table.setTableExams("Register",
                             exam -> {
                                 try {
-                                    DBManager.getInstance().insertRegistration(formId, exam, null);
-                                    table.update(DBManager.getInstance().findExam(formId));
+                                    CompositeDBManager.getInstance().insertRegistration(formId, exam, null);
+                                    table.update(CompositeDBManager.getInstance().findExam(formId));
                                 } catch (SQLException e) {
                                     showError(e);
                                 }
                             });
-                    table.update(DBManager.getInstance().findExam(formId));
+                    table.update(CompositeDBManager.getInstance().findExam(formId));
                 } else if (action.equals("Deregister to Exam")) {
                     table.setTableExamResults("Deregister", false,
                             reg -> {
                                 try {
-                                    DBManager.getInstance().deleteRegistration(formId, reg.getExam());
-                                    table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
+                                    CompositeDBManager.getInstance().deleteRegistration(formId, reg.getExam());
+                                    table.update(CompositeDBManager.getInstance().findRegistrationStudent(formId, true));
                                 } catch (SQLException e) {
                                     showError(e);
                                 }
                             });
-                    table.update(DBManager.getInstance().findRegistrationStudent(formId, true));
+                    table.update(CompositeDBManager.getInstance().findRegistrationStudent(formId, true));
                 } else if (action.equals("See Grades")) {
                     table.setTableExamResults("", false, null);
-                    table.update(DBManager.getInstance().findRegistrationStudent(formId, false));
+                    table.update(CompositeDBManager.getInstance().findRegistrationStudent(formId, false));
                 }
             }
         } catch(SQLException ex) {

@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,14 +24,29 @@ public class LevelDBManager {
     }
 
     private DB db;
+    private boolean isAvailable;
 
     public LevelDBManager()  {
         try {
             Options options = new Options();
             db = factory.open(new File("../database.leveldb"), options);
+            setAvailability(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailability(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
+
+    private void exceptionIfNotAvailable() throws LevelDBUnavailableException {
+        if(!isAvailable)
+            throw new LevelDBUnavailableException("LevelDB is unavailable (simulated)");
     }
 
     private void putKeyValue(String key, String value) {
@@ -43,13 +57,17 @@ public class LevelDBManager {
         db.put(bytes(key), bytes(Integer.toString(value)));
     }
 
-    public void addStudent(Student student) {
+    public void addStudent(Student student) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
         String studentPrefix = "student:" + student.getId() +":";
         putKeyValue(studentPrefix + "name", student.getName());
         putKeyValue(studentPrefix + "surname", student.getSurname());
     }
 
-    public void addRegistration(Registration registration) {
+    public void addRegistration(Registration registration) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
         StringBuilder key = new StringBuilder("");
         // Format -> registration:studentid:courseid:date:
         // Format -> registration:courseId:date:profId:studentid:
@@ -69,11 +87,11 @@ public class LevelDBManager {
         putKeyValue(key.toString() + "grade", registration.getGrade());
     }
 
-    public ArrayList<Registration> findRegistrationProfessor(int professorId) {
+    public ArrayList<Registration> findRegistrationProfessor(int professorId) throws LevelDBUnavailableException {
         return findRegistrations(reg -> reg.getExam().getCourse().getProfessor().getId() == professorId);
     }
 
-    public ArrayList<Registration> findRegistrationStudent(int studentId) {
+    public ArrayList<Registration> findRegistrationStudent(int studentId) throws LevelDBUnavailableException {
         return findRegistrations(reg -> reg.getStudent().getId() == studentId);
     }
 
@@ -84,11 +102,13 @@ public class LevelDBManager {
             registrations.add(registration);
     }
 
-    public ArrayList<Registration> findRegistrations() {
+    public ArrayList<Registration> findRegistrations() throws LevelDBUnavailableException {
         return findRegistrations(reg -> true);
     }
 
-    public ArrayList<Registration> findRegistrations(Function<Registration, Boolean> filter) {
+    public ArrayList<Registration> findRegistrations(Function<Registration, Boolean> filter) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
         // Result list
         ArrayList<Registration> registrationList = new ArrayList<>();
 
@@ -171,7 +191,9 @@ public class LevelDBManager {
         return registrationList;
     }
 
-    public void addExam(Exam exam) {
+    public void addExam(Exam exam) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
         StringBuilder key = new StringBuilder("");
         // Format -> exam:courseid:date:
         key.append("exam:")
@@ -181,7 +203,9 @@ public class LevelDBManager {
         putKeyValue(key.toString(), "");
     }
 
-    public Student getStudent(int studentId) {
+    public Student getStudent(int studentId) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
         Student student = new Student();
         student.setId(studentId);
 
@@ -286,7 +310,7 @@ public class LevelDBManager {
         return true;
     }
 
-    public static void importFromMysql() throws SQLException {
+    public static void importFromMysql() throws SQLException, LevelDBUnavailableException {
         LevelDBManager dbman = LevelDBManager.getInstance();
         dbman.clearAll();
 
@@ -300,11 +324,11 @@ public class LevelDBManager {
             throw new IllegalStateException("LevelDB registration list does not correspond to MySQL one");
     }
 
-    public static boolean isConsistent() throws SQLException {
+    public static boolean isConsistent() throws SQLException, LevelDBUnavailableException {
         return listDeepEqual(DBManager.getInstance().findRegistrations(), LevelDBManager.getInstance().findRegistrations());
     }
 
-    public static void test() {
+    public static void test() throws LevelDBUnavailableException {
         LevelDBManager dbman = LevelDBManager.getInstance();
 
         // Clear db
@@ -362,7 +386,7 @@ public class LevelDBManager {
         //System.out.println(stud.getName() + " " + stud.getSurname());
     }
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, LevelDBUnavailableException {
         LevelDBManager dbman = LevelDBManager.getInstance();
 
         System.out.println("-> test started");
@@ -374,5 +398,11 @@ public class LevelDBManager {
         System.out.println("-> importFromMysql finished successfully");
 
         dbman.close();
+    }
+
+    public static class LevelDBUnavailableException extends Exception {
+        public LevelDBUnavailableException(String name) {
+            super(name);
+        }
     }
 }
