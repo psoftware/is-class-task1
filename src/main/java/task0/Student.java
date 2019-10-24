@@ -6,6 +6,7 @@
 package main.java.task0;
 
 import java.util.function.Supplier;
+import java.util.Objects;
 
 /**
  *
@@ -50,6 +51,7 @@ public class Student {
 
     public static class LazyStudent extends Student {
         private Supplier<Student> suppl;
+
         public LazyStudent(Supplier<Student> suppl) {
             super();
             this.suppl = suppl;
@@ -101,5 +103,18 @@ public class Student {
             supplyIfNeeded();
             this.surname = surname;
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this)
+            return true;
+        if(obj == null || obj.getClass() != this.getClass())
+            return false;
+
+        Student student = (Student)obj;
+        return Objects.equals(student.getId(), this.getId())
+                && Objects.equals(student.getName(), this.getName())
+                && Objects.equals(student.getSurname(), this.getSurname());
     }
 }
