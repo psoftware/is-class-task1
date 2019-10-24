@@ -101,7 +101,7 @@ public class DBManager {
             String sql = "SELECT c.*, e.*, s.*, pr.* FROM exam_result e " +
                     "INNER JOIN course c ON c.id = e.course " +
                     "INNER JOIN student s ON s.id = e.student " +
-                    "INNER JOIN exam ex ON ex.course = c.id " +
+                    "INNER JOIN exam ex ON (ex.course = c.id AND ex.date = e.date) " +
                     "INNER JOIN professor pr ON pr.id = c.professor " +
                     "WHERE c.professor = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -130,7 +130,7 @@ public class DBManager {
                     "INNER JOIN course c ON c.id = e.course " +
                     "INNER JOIN student s ON s.id = e.student " +
                     "INNER JOIN professor pr ON pr.id = c.professor " +
-                    "INNER JOIN exam ex ON ex.course = c.id ";
+                    "INNER JOIN exam ex ON (ex.course = c.id AND ex.date = e.date) ";
             if (toDo)
                 sql += "WHERE e.student = ? AND grade is NULL";
             else
