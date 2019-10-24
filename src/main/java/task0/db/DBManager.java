@@ -47,7 +47,7 @@ public class DBManager {
     
     public void connect () throws SQLException {
         try {
-            String url = "jdbc:mysql://" + address + ":" + Integer.toString(port) + "/" + DBName + "?&serverTimezone=UTC";
+            String url = "jdbc:mysql://" + address + ":" + Integer.toString(port) + "/" + DBName + "?useLegacyDatetimeCode=false&serverTimezone=Europe/Rome";
             System.out.println(url);
             conn = DriverManager.getConnection(url, user, password);
         } catch (SQLException ex) {
