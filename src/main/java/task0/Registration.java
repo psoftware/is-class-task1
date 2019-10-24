@@ -26,10 +26,21 @@ public class Registration {
     public Exam getExam() {
         return exam;
     }
+    public void setExam(Exam exam) {
+        this.exam = exam;
+    }
+
     public int getGrade() {
         return grade;
     }
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
     public Student getStudent () {
         return student;
+    }
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }

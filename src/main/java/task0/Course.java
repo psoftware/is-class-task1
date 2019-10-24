@@ -25,14 +25,26 @@ public class Course {
     public int getId () {
         return id;
     }
+    public void setId(int id) {
+        this.id = id;
+    }
     
     public String getName () {
         return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
     
     public int getCfu () {
         return cfu;
     }
+    public void setCfu(int cfu) {
+        this.cfu = cfu;
+    }
 
     public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
 }
