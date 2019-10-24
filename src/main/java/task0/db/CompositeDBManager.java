@@ -1,13 +1,14 @@
 package main.java.task0.db;
 
 import com.sun.istack.internal.Nullable;
-import main.java.task0.Course;
-import main.java.task0.Exam;
-import main.java.task0.Registration;
+import main.java.task0.*;
+import main.java.task0.db.LevelDBManager.*;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.function.Consumer;
 
 public class CompositeDBManager {
     private static CompositeDBManager INSTANCE;
@@ -70,5 +71,64 @@ public class CompositeDBManager {
         }
 
         levelDBManager.close();
+    }
+
+    // Testing code
+    public static void importFromMysql() throws SQLException, LevelDBUnavailableException {
+        LevelDBManager dbman = LevelDBManager.getInstance();
+        dbman.clearAll();
+
+        ArrayList<Registration> mysqlRegistrations = DBManager.getInstance().findRegistrations();
+        for(Registration r : mysqlRegistrations)
+            dbman.addRegistration(r);
+        dbman.dumpAll();
+
+        // assert
+        if(!CompositeDBManager.getInstance().isConsistent())
+            throw new IllegalStateException("LevelDB registration list does not correspond to MySQL one");
+    }
+
+    public static boolean listDeepEqual(ArrayList<Registration> list1, ArrayList<Registration> list2) {
+        //System.out.println("Deepequal debug:");
+        if(list1.size() != list2.size())
+            return false;
+
+        HashSet<Integer> pickedFormList2 = new HashSet<>();
+
+        // THIS ALGORITHM is O(n^2) and could be optimized with hashtables.
+        // However we didn't implement any hashcode method
+        for(int i=0; i<list1.size(); i++) {
+            //System.out.println("Element " + i +":");
+            //printRegistration.accept(list1.get(i));
+            //System.out.println("v");
+            boolean found = false;
+            for(int j=0; j<list2.size(); j++) {
+                //printRegistration.accept(list2.get(j));
+                if (!pickedFormList2.contains(j) && list1.get(i).equals(list2.get(j))) {
+                    found = true;
+                    pickedFormList2.add(j);
+                    break;
+                }
+            }
+
+            if(!found)
+                return false;
+        }
+
+        return true;
+    }
+
+    public boolean isConsistent() throws SQLException, LevelDBUnavailableException {
+        return listDeepEqual(DBManager.getInstance().findRegistrations(), LevelDBManager.getInstance().findRegistrations());
+    }
+
+    public static void main(String[] args) throws SQLException, LevelDBUnavailableException {
+        LevelDBManager dbman = LevelDBManager.getInstance();
+
+        System.out.println("-> importFromMysql started");
+        importFromMysql();
+        System.out.println("-> importFromMysql finished successfully");
+
+        dbman.close();
     }
 }

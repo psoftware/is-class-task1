@@ -57,4 +57,17 @@ public class Registration {
                 && Objects.equals(registration.getGrade(), this.getGrade())
                 && Objects.equals(registration.getStudent(), this.getStudent());
     }
+
+    @Override
+    public String toString() {
+        Student student = this.getStudent();
+        Exam exam = this.getExam();
+        Course course = exam.getCourse();
+        Professor prof = course.getProfessor();
+
+        return "Student: " + student.getId() + " " + student.getName() + " " + student.getSurname() + " "
+                + "Professor: " + prof.getId() + " " + prof.getName() + " " + prof.getSurname() + " "
+                + "Exam: " + exam.getDate() + " "
+                + "Course: " + course.getId() + " "+ course.getName() + " " + course.getCfu();
+    }
 }
