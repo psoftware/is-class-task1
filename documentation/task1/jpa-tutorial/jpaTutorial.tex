@@ -1,0 +1,73 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+
+
+%information to be included in the title page:
+\title{JPA Tutorial}
+\author{Adriano Botti, Antonio Le Caldare, Francesco Merola, Giacomo Ponziani}
+\institute{Information Systems, University of Pisa}
+\date{Fall, 2019}
+
+\begin{document}
+
+%generates the title page containing introductory information
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{What is and Why JPA}
+JPA (Java Persistence API) is a Java specification for ORM (Object Relational Mapping). The purpose of ORM is to map the concepts from ObjectOriented Programming with concepts of relational databases to let the programmer to focus on the business logic instead of the translation between the two worlds. Once the mapping is done it is possble to work with instances of classes that are directly mapped to rows of table without performing any transformation.
+In this tutorial we focus on Hibernate which is one of the implementation of the JPA specification. 
+\end{frame}
+
+\begin{frame}
+\frametitle{How to use JPA}
+Mapping may be done using \textit{annotations} or \textit{persistence.xml} file or both. Usually the \textit{persistence.xml} file is used to store information about the connection with the DB while \textit{annotations} are used actually map classes into tables.
+\begin{enumerate}
+\item Define the \textit{persistence.xml} file;
+\item Define classes using \textit{annotations} to map them with tables;
+\item Use \textit{JPQL} to perform \textit{CRUD} operations;
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Examples Definition}
+All the following examples come from the application developed in \textit{Task 1}. This application handles university exams creation, registration, deregistration and validation.
+For clarity the class-diagram is reported.
+\linebreak
+\linebreak
+--INSERT CLASS DIAGRAM--
+\end{frame}
+
+\begin{frame}
+\frametitle{JPA Annotations}
+\begin{itemize}
+\item \textit{@Entity}, specifies the following class is an entity to be mapped to one or more tables in the DB.
+\item \textit{@Table}, specifies the primary table for the annotated entity. The attribute \textit{name} indicates the referenced table in the DB.
+\item \textit{@Column}, specifies the mapped column for a persistent property or field. The attribute \textit{name} indicates the name of the corresponding table column. It may be neglected when names of the attribute and of the columns are the same. \alert{Note} that if the names are not equal Hinerbate will add a column to the table with name equals to the value if the \textit{name}.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\begin{itemize}
+\item @Entity
+\item @Table
+\item @Column
+\item @Id
+\item @GeneratedValue
+\item @Embeddable
+\item @EmbeddedID
+\item @MapsId
+\item @JoinColumn
+\item @JoinColumns
+\item @ManyToOne
+\item @OneToMany
+\item @ManyToMany
+\item @OneToOne
+\end{itemize}
+\end{frame}
+
+\end{document}
+
+\end{document}
