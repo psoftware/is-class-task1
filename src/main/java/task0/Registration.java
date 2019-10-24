@@ -13,12 +13,12 @@ import java.util.Objects;
  * @author cacomop
  */
 public class Registration {
-    private int grade;
+    private Integer grade;
 
     private Student student;
     private Exam exam;
     
-    public Registration (Student student, Exam exam, int grade) {
+    public Registration (Student student, Exam exam, Integer grade) {
         this.exam = exam;
         this.grade = grade;
         this.student = student;
@@ -31,10 +31,10 @@ public class Registration {
         this.exam = exam;
     }
 
-    public int getGrade() {
+    public Integer getGrade() {
         return grade;
     }
-    public void setGrade(int grade) {
+    public void setGrade(Integer grade) {
         this.grade = grade;
     }
 

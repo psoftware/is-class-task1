@@ -134,7 +134,7 @@ public class Table  extends TableView {
 
         course.setCellValueFactory(MappedTableColumn.<Registration>build(p -> p.getExam().getCourse().getName()));
         date.setCellValueFactory((MappedTableColumn.<Registration>build(p -> p.getExam().getDate().toString())));
-        grade.setCellValueFactory(MappedTableColumn.<Registration>build(p -> Integer.toString(p.getGrade())));
+        grade.setCellValueFactory(MappedTableColumn.<Registration>build(p -> (p.getGrade() != null) ? Integer.toString(p.getGrade()) : ""));
         getColumns().addAll(course, date, grade);
 
         if(callback != null) {
