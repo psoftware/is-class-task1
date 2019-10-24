@@ -43,7 +43,8 @@ public class Exam {
             return false;
 
         Exam exam = (Exam)obj;
-        return Objects.equals(exam.getDate(), this.getDate())
-                && Objects.equals(exam.getCourse(), this.getCourse());
+        return Objects.equals(exam.getCourse(), this.getCourse())
+                && ((exam.getDate() == this.getDate()) ||
+                (exam.getDate() != null && exam.getDate().toLocalDate().equals(this.getDate().toLocalDate())));
     }
 }
