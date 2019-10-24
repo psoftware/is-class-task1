@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.iq80.leveldb.impl.Iq80DBFactory.*;
 
@@ -68,7 +69,26 @@ public class LevelDBManager {
         putKeyValue(key.toString() + "grade", registration.getGrade());
     }
 
+    public ArrayList<Registration> findRegistrationProfessor(int professorId) {
+        return findRegistrations(reg -> reg.getExam().getCourse().getProfessor().getId() == professorId);
+    }
+
+    public ArrayList<Registration> findRegistrationStudent(int studentId) {
+        return findRegistrations(reg -> reg.getStudent().getId() == studentId);
+    }
+
+    // add registration to registration list only if filters returns true
+    private void conditionalAdd(ArrayList<Registration> registrations, Registration registration,
+                               Function<Registration, Boolean> filter) {
+        if(filter.apply(registration))
+            registrations.add(registration);
+    }
+
     public ArrayList<Registration> findRegistrations() {
+        return findRegistrations(reg -> true);
+    }
+
+    public ArrayList<Registration> findRegistrations(Function<Registration, Boolean> filter) {
         // Result list
         ArrayList<Registration> registrationList = new ArrayList<>();
 
@@ -78,8 +98,6 @@ public class LevelDBManager {
         Course course = null;
         Exam exam = null;
         Registration registration = null;
-
-        boolean firstEntry = true;
 
         DBIterator keyIterator = db.iterator();
         keyIterator.seek(bytes("registration:"));
@@ -96,7 +114,7 @@ public class LevelDBManager {
                 if(!prefix.equals("registration")) {
                     // we must save the latest registration object! (if there is one)
                     if(registration != null)
-                        registrationList.add(registration);
+                        conditionalAdd(registrationList, registration, filter);
                     return registrationList;
                 }
 
@@ -117,7 +135,7 @@ public class LevelDBManager {
                         (courseId != course.getId() || !date.equals(exam.getDate()) || studentId != student.getId())) {
                     // we must save the last registration instance (if it is not the first registration)
                     if(registration != null)
-                        registrationList.add(registration);
+                        conditionalAdd(registrationList, registration, filter);
 
                     // we must create another instance of registration (and all the linked objects...)
                     student = new Student(studentId, null, null);
@@ -148,7 +166,7 @@ public class LevelDBManager {
         // If we are here is because last entry of the database had "registration" prefix, so
         // we must save the latest registration object! (if there is one)
         if(registration != null)
-            registrationList.add(registration);
+            conditionalAdd(registrationList, registration, filter);
 
         return registrationList;
     }
@@ -226,23 +244,24 @@ public class LevelDBManager {
         }
     }
 
+    private static Consumer<Registration> printRegistration = r -> {
+        Student student = r.getStudent();
+        Exam exam = r.getExam();
+        Course course = exam.getCourse();
+        Professor prof = course.getProfessor();
+
+        System.out.println("Student: " + student.getId() + " " + student.getName() + " " + student.getSurname() + " "
+                + "Professor: " + prof.getId() + " " + prof.getName() + " " + prof.getSurname() + " "
+                + "Exam: " + exam.getDate() + " "
+                + "Course: " + course.getId() + " "+ course.getName() + " " + course.getCfu());
+    };
+
     public static boolean listDeepEqual(ArrayList<Registration> list1, ArrayList<Registration> list2) {
         //System.out.println("Deepequal debug:");
         if(list1.size() != list2.size())
             return false;
 
         HashSet<Integer> pickedFormList2 = new HashSet<>();
-        Consumer<Registration> printRegistration = r -> {
-            Student student = r.getStudent();
-            Exam exam = r.getExam();
-            Course course = exam.getCourse();
-            Professor prof = course.getProfessor();
-
-            System.out.println(student.getId() + " " + student.getName() + " " + student.getSurname() + " "
-                    + prof.getId() + " " + prof.getName() + " " + prof.getSurname() + " "
-                    + exam.getDate() + " "
-                    + course.getId() + course.getName() + " " + course.getCfu());
-        };
 
         // THIS ALGORITHM is O(n^2) and could be optimized with hashtables.
         // However we didn't implement any hashcode method
@@ -301,7 +320,7 @@ public class LevelDBManager {
         dbman.addStudent(stud);
 
         // Test Add Exam
-        Professor professor = new Professor(1, "Tizio", "CognomeTizio");
+        Professor professor = new Professor(1, "Professore1", "Professore1Cognome");
         Course c = new Course(1, "Corso brutto", -10, professor);
         Exam e = new Exam(c, Date.valueOf("2019-7-7"));
         dbman.addExam(e);
@@ -316,14 +335,28 @@ public class LevelDBManager {
         dbman.addRegistration(reg);
 
         student = new Student(3,"Antonio3", "Le Caldare3");
-        reg = new Registration(student, e, 12);
+        professor = new Professor(2, "Professore2", "Professore2Cognome");
+        c = new Course(1, "Corso brutto del Prof2", -10, professor);
+        e = new Exam(c, Date.valueOf("2018-8-8"));
+        reg = new Registration(student, e, 33);
         dbman.addRegistration(reg);
 
         dbman.dumpAll();
 
+        System.out.println("-> Printing list for findRegistrations");
         List<Registration> regList = dbman.findRegistrations();
         for(Registration r : regList)
-            System.out.println(r.getExam().getCourse().getName() + " " + r.getGrade());
+            printRegistration.accept(r);
+
+        System.out.println("-> Printing list for findRegistrationProfessor");
+        regList = dbman.findRegistrationProfessor(1);
+        for(Registration r : regList)
+            printRegistration.accept(r);
+
+        System.out.println("-> Printing list for findRegistrationStudent");
+        regList = dbman.findRegistrationStudent(1);
+        for(Registration r : regList)
+            printRegistration.accept(r);
 
         //stud = dbman.getStudent(2);
         //System.out.println(stud.getName() + " " + stud.getSurname());
