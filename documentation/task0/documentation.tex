@@ -1,6 +1,6 @@
 \documentclass{report}
 \usepackage{graphicx}
-\graphicspath{ {./images/} }
+\graphicspath{{./images/}}
 \usepackage[nottoc]{tocbibind}
 \usepackage{blindtext}
 \usepackage{booktabs}% http://ctan.org/pkg/booktabs
@@ -176,6 +176,152 @@ Here we define in detail the terms for the main entites and relationships we wil
 
 \addcontentsline{toc}{chapter}{User's Manual}
 \chapter*{User's Manual}
+The application starts and shows a minimal user interface, fig. \ref{fig:UIStart},
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{UIStart.png}
+	\caption{User Interface when the application starts}
+	\label{fig:UIStart}
+\end{figure}
+composed of:
+\begin{itemize}
+	\item \textit{UserID} field, where the user specifies his id number;
+	\item \textit{Role} choise box, whith the option:
+	\begin{enumerate}
+		\item Professor, in case the user is a Professor;
+		\item Student, in case the user is a Student.
+	\end{enumerate} 
+	\item \textit{What do you want to do?} choise box, where the user specifies the action he wants to perform. The options change according to the role chosen.
+Professor can select among:
+	\begin{enumerate}
+		\item \textit{Add Exam} if he wants to add an exam;
+		\item \textit{Add Grade} if he wants to add a grade.
+	\end{enumerate}
+	A Student can select among:
+	\begin{enumerate}
+		\item \textit{Register to Exam} if he wants to register to an exam;
+		\item \textit{Deregister to Exam} if he wants to deregister to an exam;
+		\item \textit{See Grades} if he wants to see the grades he got.
+	\end{enumerate}
+	\item \textit{Confirm} button;
+	\item A table showing the results of the selected operation. The layout of the table can change according depending on the selected operation.
+\end{itemize}
+\section*{Professor}
+A Professor:
+\begin{enumerate}
+	\item Inserts his ID number into the \textit{UserID} field;
+	\item Selects \textsl{Professor} in the \textit{Role} choise box;
+	\item Selects the action he wants to perform;
+	\item Pushes the \textit{Confirm} button.
+\end{enumerate}
+\subsubsection*{Add Exam}
+If the Professor select the \textit{Add Exam} option, the table, fig. \ref{fig:AddExam}, is populated with a list of all the courses he is currently holding. Each element of the list is composed of:
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{AddExam.png}
+	\caption{Example of Add Exam}
+	\label{fig:AddExam}
+\end{figure}
+\begin{itemize}
+	\item \textit{ID}, the id of the course;
+	\item \textit{Name}, the name of the course;
+	\item \textit{CFU}, the number of credits assigned to the course;
+	\item \textit{Add Exam Date}, button the professor has to push in order to add an exam corresponding to the course. 
+\end{itemize}
+
+If the Professor pushes one of the \textit{Add Exam Date} buttons a confirm dialog is presented and it asks for the date of the exam to insert, fig. \ref{fig:AddExamDialog}.
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.5\textwidth]{AddExamDialog.png}
+	\caption{Example of Add Exam dialog}
+	\label{fig:AddExamDialog}
+\end{figure} 
+If the Professor wants to confirm he:
+\begin{enumerate}
+	\item Selects the date using the datepicker;
+	\item Pushes the \textit{Confirm} button in the dialog.
+\end{enumerate}
+To go back and undo the operation the Professor just pushes the \textit{Delete} button.
+\subsubsection*{Add Grade}
+If the Professor select the \textit{Add Grade} option, the table, fig. \ref{fig:AddGrade}, is populated with a list of all the registrations to the courses he is currently holding. Each element of the list is composed of:
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{AddGrade.png}
+	\caption{Example of Add Grade}
+	\label{fig:AddGrade}
+\end{figure}
+\begin{itemize}
+	\item \textit{Student}, the id of the student enrolled to the exam;
+	\item \textit{Course}, the name of the course;
+	\item \textit{Date}, the date of the exam;
+	\item \textit{Insert Mark} button that the professor has to push in order to insert a grade to the corresponding registration. 
+\end{itemize}
+If the Professor pushes one of the \textit{Insert mark} buttons a confirm dialog is presented and it asks for the grade of the exam to insert, fig. \ref{fig:AddGradeDialog}.
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.5\textwidth]{AddGradeDialog.png}
+	\caption{Example of Add Grade dialog}
+	\label{fig:AddGradeDialog}
+\end{figure}
+If the Professor wants to confirm he:
+\begin{enumerate}
+	\item Inserts the grade in the corresponding field;
+	\item Pushes the \textit{Confirm} button in the dialog.
+\end{enumerate}
+To go back and undo the operation the Professor just pushes the \textit{Delete} button.
+
+\section*{Student}
+A Student:
+\begin{enumerate}
+	\item Inserts his ID number in the \textit{UserID} field;
+	\item Selects \textsl{Student} in the \textit{Role} choise box;
+	\item Selects the action he wants to perform;
+	\item Pushes the \textit{Confirm} button.
+\end{enumerate}
+\subsubsection*{Register to Exam}
+If the Student select the \textit{Register to Exam} option, the table, fig. \ref{fig:RegisterToExam}, is populated with a list of all the available exams. Each element of the list is composed of:
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{RegisterToExam.png}
+	\caption{Example of Register to Exam}
+	\label{fig:RegisterToExam}
+\end{figure}
+\begin{itemize}
+	\item \textit{Course}, the name of the course;
+	\item \textit{Date}, the date of the exam;
+	\item \textit{Register}, button the student has to push in order to register to the selected exam. 
+\end{itemize}
+If the Student pushes one of the \textit{Register to Exam} the table is updated so that it shows all the exams to which the Student is not enrolled.
+
+\subsubsection*{Deregister to Exam}
+If the Student select the \textit{Deregister} option, the table, fig. \ref{fig:DeregisterToExam}, is populated with a list of all the registrations corresponding to the Student. Each element of the list is composed of:
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{DeregisterToExam.png}
+	\caption{Example of Deregister to Exam}
+	\label{fig:DeregisterToExam}
+\end{figure}
+\begin{itemize}
+	\item \textit{Course}, the name of the course of the exam the Student is enrolled to;
+	\item \textit{Date}, the date of the exam;
+	\item \textit{Deregister} button that the Stuedent has to push in order to do the deregistration. 
+\end{itemize}
+If the Professor pushes one of the \textit{Deregister} the table is updated so that it shows all the exams to which the Student is not enrolled.
+
+\subsubsection*{See Grades}
+If the Student select the \textit{See Grades} option, the table, fig. \ref{fig:SeeGrades}, is populated with a list of all the exams the student has done. Each element of the list is composed of:
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{SeeGrades.png}
+	\caption{Example of See Grades}
+	\label{fig:SeeGrades}
+\end{figure}
+\begin{itemize}
+	\item \textit{Course}, the name of the course;
+	\item \textit{Date}, the date when the student passed the exam;
+	\item \textit{Grade}, the grade the Student got. 
+\end{itemize}
+
 
 \begin{thebibliography}{9}
 \end{thebibliography}
