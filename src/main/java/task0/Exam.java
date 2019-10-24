@@ -6,6 +6,7 @@
 package main.java.task0;
 
 import java.sql.Date;
+import java.util.Objects;
 
 /**
  *
@@ -23,8 +24,26 @@ public class Exam {
     public Date getDate () {
         return date;
     }
+    public void setDate(Date date) {
+        this.date = date;
+    }
     
     public Course getCourse () {
         return course;
+    }
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this)
+            return true;
+        if(obj == null || obj.getClass() != this.getClass())
+            return false;
+
+        Exam exam = (Exam)obj;
+        return Objects.equals(exam.getDate(), this.getDate())
+                && Objects.equals(exam.getCourse(), this.getCourse());
     }
 }

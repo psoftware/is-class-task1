@@ -5,6 +5,8 @@
  */
 package main.java.task0;
 
+import java.util.Objects;
+
 /**
  *
  * @author cacomop
@@ -25,14 +27,40 @@ public class Course {
     public int getId () {
         return id;
     }
+    public void setId(int id) {
+        this.id = id;
+    }
     
     public String getName () {
         return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
     
     public int getCfu () {
         return cfu;
     }
+    public void setCfu(int cfu) {
+        this.cfu = cfu;
+    }
 
     public Professor getProfessor() { return professor; }
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this)
+            return true;
+        if(obj == null || obj.getClass() != this.getClass())
+            return false;
+
+        Course course = (Course)obj;
+        return Objects.equals(course.getId(), this.getId())
+                && Objects.equals(course.getName(), this.getName())
+                && Objects.equals(course.getCfu(), this.getCfu())
+                && Objects.equals(course.getProfessor(), this.getProfessor());
+    }
 }
