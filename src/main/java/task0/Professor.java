@@ -5,6 +5,8 @@
  */
 package main.java.task0;
 
+import java.util.Objects;
+
 /**
  *
  * @author adria
@@ -42,5 +44,18 @@ public class Professor {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this)
+            return true;
+        if(obj == null || obj.getClass() != this.getClass())
+            return false;
+
+        Professor professor = (Professor)obj;
+        return Objects.equals(professor.getId(), this.getId())
+                && Objects.equals(professor.getName(), this.getName())
+                && Objects.equals(professor.getSurname(), this.getSurname());
     }
 }
