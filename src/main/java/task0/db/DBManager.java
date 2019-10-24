@@ -94,6 +94,37 @@ public class DBManager {
             TriggerSQLException.handleSqlException(ex);
         }
     }
+
+    private ArrayList<Registration> extractRegistrationsFrom(ResultSet rs) throws SQLException{
+        ArrayList<Registration> result = new ArrayList<Registration>();
+        while (rs.next()) {
+            Student student = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
+            Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
+            Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
+            Exam exam = new Exam(course, rs.getDate("date"));
+            Registration reg = new Registration(student, exam, rs.getInt("grade"));
+            result.add(reg);
+        }
+
+        return result;
+    }
+
+    public ArrayList<Registration> findRegistrations() throws SQLException {
+        ArrayList<Registration> result = null;
+        try {
+            String sql = "SELECT c.*, e.*, s.*, pr.* FROM exam_result e " +
+                    "INNER JOIN course c ON c.id = e.course " +
+                    "INNER JOIN student s ON s.id = e.student " +
+                    "INNER JOIN exam ex ON (ex.course = c.id AND ex.date = e.date) " +
+                    "INNER JOIN professor pr ON pr.id = c.professor ";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.execute();
+            return extractRegistrationsFrom(pstmt.getResultSet());
+        } catch (SQLException ex) {
+            TriggerSQLException.handleSqlException(ex);
+        }
+        return result;
+    }
     
     public ArrayList<Registration> findRegistrationProfessor (int id) throws SQLException {
         ArrayList<Registration> result = null;
@@ -107,17 +138,7 @@ public class DBManager {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             pstmt.execute();
-            ResultSet rs = pstmt.getResultSet();
-            result = new ArrayList<Registration>();
-            while (rs.next()) {
-                int studentId = rs.getInt("s.id");
-                Student.LazyStudent student = new Student.LazyStudent(() -> LevelDBManager.getInstance().getStudent(studentId));
-                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
-                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
-                Exam exam = new Exam(course, rs.getDate("date"));
-                Registration reg = new Registration(student, exam, rs.getInt("grade"));
-                result.add(reg);
-            }
+            return extractRegistrationsFrom(pstmt.getResultSet());
         } catch (SQLException ex) {
             TriggerSQLException.handleSqlException(ex);
         }
@@ -141,16 +162,7 @@ public class DBManager {
             pstmt.setInt(1, id);
             pstmt.execute();
             ResultSet rs = pstmt.getResultSet();
-            result = new ArrayList<Registration>();
-            while (rs.next()) {
-                int studentId = rs.getInt("s.id");
-                Student.LazyStudent student = new Student.LazyStudent(() -> LevelDBManager.getInstance().getStudent(studentId));
-                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
-                Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
-                Exam exam = new Exam(course, rs.getDate("date"));
-                Registration reg = new Registration(student, exam, rs.getInt("grade"));
-                result.add(reg);
-            }
+            return extractRegistrationsFrom(pstmt.getResultSet());
         } catch (SQLException ex) {
             TriggerSQLException.handleSqlException(ex);
         }
