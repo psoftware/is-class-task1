@@ -115,6 +115,8 @@ public class DBManager {
                 Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam exam = new Exam(course, rs.getDate("date"));
                 Registration reg = new Registration(student, exam, rs.getInt("grade"));
+                if(rs.wasNull())
+                    reg.setGrade(null);
                 result.add(reg);
             }
         } catch (SQLException ex) {
@@ -147,6 +149,8 @@ public class DBManager {
                 Course course = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
                 Exam exam = new Exam(course, rs.getDate("date"));
                 Registration reg = new Registration(student, exam, rs.getInt("grade"));
+                if(rs.wasNull())
+                    reg.setGrade(null);
                 result.add(reg);
             }
         } catch (SQLException ex) {
