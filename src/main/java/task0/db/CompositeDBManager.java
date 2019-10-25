@@ -84,7 +84,7 @@ public class CompositeDBManager {
             mysqlDBMan.updateRegistration(reg, grade);
             levelDBManager.updateRegistration(reg, grade);
             mysqlDBMan.getConnection().commit();
-        } catch (LevelDBUnavailableException e) {
+        } catch (Exception e) {
             mysqlDBMan.getConnection().rollback();
             throw e;
         } finally {
@@ -101,7 +101,7 @@ public class CompositeDBManager {
             mysqlDBMan.deleteRegistration(studentId, exam);
             levelDBManager.deleteRegistration(studentId, exam);
             mysqlDBMan.getConnection().commit();
-        } catch (LevelDBUnavailableException e) {
+        } catch (Exception e) {
             mysqlDBMan.getConnection().rollback();
             throw e;
         } finally {
@@ -126,7 +126,7 @@ public class CompositeDBManager {
             mysqlDBMan.insertRegistration(studentId, exam, grade);
             levelDBManager.insertRegistration(student, exam, grade);
             mysqlDBMan.getConnection().commit();
-        } catch (LevelDBUnavailableException e) {
+        } catch (Exception e) {
             mysqlDBMan.getConnection().rollback();
             throw e;
         } finally {
