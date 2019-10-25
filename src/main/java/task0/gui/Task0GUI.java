@@ -2,6 +2,7 @@ package main.java.task0.gui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -10,6 +11,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 import javafx.event.ActionEvent;
+import javafx.scene.text.TextAlignment;
 import main.java.task0.Course;
 import main.java.task0.db.CompositeDBManager;
 import main.java.task0.db.DBManager;
@@ -29,22 +31,34 @@ public class Task0GUI {
     private final VBox outerVbox;
     private final Table table;
     private final HBox lowerHbox;
+    private final Label levelDbAvailLabel = new Label("LevelDB Availability:");
+    private final Label queryInfoLabel = new Label("Query Info");
+    private final ChoiceBox levelDbAvailBox;
     
     public Task0GUI(){
 
         larghezzaFinestra = 650;
-        lunghezzaFinestra = 550;
+        lunghezzaFinestra = 600;
         font = "Arial";
         background = "ALICEBLUE";
         
         Label title = new Label("Task0");
         title.setFont(Font.font(font, FontWeight.BOLD, 20));
-        
+
+        levelDbAvailBox = new ChoiceBox(FXCollections.observableArrayList(new String[]{ "Available", "Not Available" }));
+        levelDbAvailBox.getSelectionModel().selectFirst();
+
         form = new Form();
         table = new Table();
-        lowerHbox = new HBox();
+
+        VBox lowerVbox1 = new VBox(levelDbAvailLabel);
+        VBox lowerVbox2 = new VBox(levelDbAvailBox);
+        lowerHbox = new HBox(lowerVbox1, lowerVbox2);
+        lowerHbox.setSpacing(15);
+        lowerHbox.setAlignment(Pos.BOTTOM_CENTER);
+        queryInfoLabel.setTextAlignment(TextAlignment.CENTER);
         
-        outerVbox = new VBox(title, form.getForm(), table, lowerHbox);
+        outerVbox = new VBox(title, form.getForm(), table, queryInfoLabel, lowerHbox);
         outerVbox.setPrefSize(larghezzaFinestra, lunghezzaFinestra);
         outerVbox.setStyle("-fx-background: "+ background);
         outerVbox.setAlignment(Pos.TOP_CENTER);
@@ -55,6 +69,11 @@ public class Task0GUI {
     }
     
    public void eventInit(){
+       levelDbAvailBox.getSelectionModel().selectedIndexProperty().addListener((ov, value, new_value) -> {
+           boolean avalability = (new_value.intValue() == 0);
+           LevelDBManager.getInstance().setAvailability(avalability);
+       });
+
         form.getRole().showingProperty().addListener((obs, wasShowing, isNowShowing) -> {
             if(isNowShowing)
                 if( !(form.getID().isEmpty()) ){
@@ -115,6 +134,7 @@ public class Task0GUI {
                                     CompositeDBManager.getInstance().insertExam(course.getId(), newdate);
                                     CompositeDBManager.getInstance().checkConsistency();
                                     SimpleDialog.showConfirmDialog("Exam added successfully");
+                                    updateQueryInfoLabel();
                                 } catch (Exception e) {
                                     showError(e);
                                 }
@@ -129,6 +149,7 @@ public class Task0GUI {
                                     table.update(CompositeDBManager.getInstance().findRegistrationProfessor(formId));
                                     CompositeDBManager.getInstance().checkConsistency();
                                     SimpleDialog.showConfirmDialog("Mark added successfully");
+                                    updateQueryInfoLabel();
                                 } catch (Exception e) {
                                     showError(e);
                                 }
@@ -143,6 +164,7 @@ public class Task0GUI {
                                     CompositeDBManager.getInstance().insertRegistration(formId, exam, null);
                                     CompositeDBManager.getInstance().checkConsistency();
                                     table.update(CompositeDBManager.getInstance().findExam(formId));
+                                    updateQueryInfoLabel();
                                 } catch (Exception e) {
                                     showError(e);
                                 }
@@ -155,6 +177,7 @@ public class Task0GUI {
                                     CompositeDBManager.getInstance().deleteRegistration(formId, reg.getExam());
                                     CompositeDBManager.getInstance().checkConsistency();
                                     table.update(CompositeDBManager.getInstance().findRegistrationStudent(formId, true));
+                                    updateQueryInfoLabel();
                                 } catch (Exception e) {
                                     showError(e);
                                 }
@@ -165,6 +188,7 @@ public class Task0GUI {
                     table.update(CompositeDBManager.getInstance().findRegistrationStudent(formId, false));
                 }
             }
+            updateQueryInfoLabel();
         } catch(Exception ex) {
             showError(ex);
         }
@@ -187,6 +211,19 @@ public class Task0GUI {
         SimpleDialog.showErrorDialog(errString);
 
         //ex.printStackTrace();
+    }
+
+    public void updateQueryInfoLabel() throws SQLException, LevelDBManager.LevelDBUnavailableException {
+        CompositeDBManager.QueryExecutor lastQueryExecutor = CompositeDBManager.getInstance().getLastExecutor();
+        String prefix = "Last query executed by ";
+        switch(lastQueryExecutor) {
+            case MySQL:
+                queryInfoLabel.setText(prefix + "MySQL database"); break;
+            case LevelDB:
+                queryInfoLabel.setText(prefix + "LevelDB database"); break;
+            case Both:
+                queryInfoLabel.setText(prefix + "both MySQL and LevelDB databases"); break;
+        }
     }
 
     public VBox getOuterVbox(){return outerVbox;}

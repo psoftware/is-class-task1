@@ -16,6 +16,9 @@ public class CompositeDBManager {
     private DBManager mysqlDBMan;
     private LevelDBManager levelDBManager;
 
+    public enum QueryExecutor{MySQL, LevelDB, Both};
+    private QueryExecutor lastExecutor;
+
     public static CompositeDBManager getInstance() throws SQLException, LevelDBUnavailableException {
         if(INSTANCE == null) {
             INSTANCE = new CompositeDBManager();
@@ -29,34 +32,46 @@ public class CompositeDBManager {
         levelDBManager = LevelDBManager.getInstance();
     }
 
+    public QueryExecutor getLastExecutor() {
+        return lastExecutor;
+    }
+
     public ArrayList<Course> findCourse(int profID) throws SQLException {
+        lastExecutor = QueryExecutor.MySQL;
         return mysqlDBMan.findCourse(profID);
     }
 
     public void insertExam(int courseID, LocalDate date) throws SQLException {
+        lastExecutor = QueryExecutor.MySQL;
         mysqlDBMan.insertExam(courseID, date);
     }
 
     public ArrayList<Registration> findRegistrations() throws SQLException {
         try {
+            lastExecutor = QueryExecutor.LevelDB;
             return levelDBManager.findRegistrations();
         } catch (LevelDBUnavailableException e) {
+            lastExecutor = QueryExecutor.MySQL;
             return mysqlDBMan.findRegistrations();
         }
     }
 
     public ArrayList<Registration> findRegistrationProfessor(int id) throws SQLException {
         try {
+            lastExecutor = QueryExecutor.LevelDB;
             return levelDBManager.findRegistrationProfessor(id);
         } catch (LevelDBUnavailableException e) {
+            lastExecutor = QueryExecutor.MySQL;
             return mysqlDBMan.findRegistrationProfessor(id);
         }
     }
 
     public ArrayList<Registration> findRegistrationStudent(int id, boolean toDo) throws SQLException {
         try {
+            lastExecutor = QueryExecutor.LevelDB;
             return levelDBManager.findRegistrationStudent(id, toDo);
         } catch (LevelDBUnavailableException e) {
+            lastExecutor = QueryExecutor.MySQL;
             return mysqlDBMan.findRegistrationStudent(id, toDo);
         }
     }
@@ -64,6 +79,7 @@ public class CompositeDBManager {
     public void updateRegistration(Registration reg, int grade) throws SQLException, LevelDBUnavailableException {
         mysqlDBMan.getConnection().setAutoCommit(false);
         try {
+            lastExecutor = QueryExecutor.Both;
             mysqlDBMan.updateRegistration(reg, grade);
             levelDBManager.updateRegistration(reg, grade);
             mysqlDBMan.getConnection().commit();
@@ -78,6 +94,7 @@ public class CompositeDBManager {
     public void deleteRegistration(int studentId, Exam exam) throws SQLException, LevelDBUnavailableException {
         mysqlDBMan.getConnection().setAutoCommit(false);
         try {
+            lastExecutor = QueryExecutor.Both;
             mysqlDBMan.deleteRegistration(studentId, exam);
             levelDBManager.deleteRegistration(studentId, exam);
             mysqlDBMan.getConnection().commit();
@@ -90,12 +107,14 @@ public class CompositeDBManager {
     }
 
     public ArrayList<Exam> findExam(int studentId) throws SQLException {
+        lastExecutor = QueryExecutor.MySQL;
         return mysqlDBMan.findExam(studentId);
     }
 
     public void insertRegistration(int studentId, Exam exam, @Nullable Integer grade) throws SQLException, LevelDBUnavailableException {
         mysqlDBMan.getConnection().setAutoCommit(false);
         try {
+            lastExecutor = QueryExecutor.Both;
             Student student = mysqlDBMan.findStudent(studentId);
             if(student == null)
                 throw new IllegalStateException("No student result associated to Student ID");
