@@ -67,7 +67,7 @@ public class Registration {
 
         return "Student: " + student.getId() + " " + student.getName() + " " + student.getSurname() + " "
                 + "Professor: " + prof.getId() + " " + prof.getName() + " " + prof.getSurname() + " "
-                + "Exam: " + exam.getDate() + " "
+                + "Exam: " + exam.getDate() + " grade: " + ((getGrade() == null) ? "null" : getGrade()) + " "
                 + "Course: " + course.getId() + " "+ course.getName() + " " + course.getCfu();
     }
 }

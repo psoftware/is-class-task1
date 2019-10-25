@@ -54,6 +54,10 @@ public class DBManager {
             TriggerSQLException.handleSqlException(ex);
         }        
     }
+
+    protected Connection getConnection() {
+        return conn;
+    }
     
     public void disconnect () throws SQLException {
         try {
@@ -76,6 +80,24 @@ public class DBManager {
                 Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
                 Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"), professor);
                 result.add(c);
+            }
+        } catch (SQLException ex) {
+            TriggerSQLException.handleSqlException(ex);
+        }
+        return result;
+    }
+
+    public Student findStudent(int studentId) throws SQLException {
+        Student result = null;
+        try {
+            String sql = "SELECT s.* FROM student s WHERE s.id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, studentId);
+            pstmt.execute();
+            ResultSet rs = pstmt.getResultSet();
+            while (rs.next()){
+                // We should get just one row or none
+                result = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
             }
         } catch (SQLException ex) {
             TriggerSQLException.handleSqlException(ex);

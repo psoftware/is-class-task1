@@ -13,6 +13,7 @@ import javafx.event.ActionEvent;
 import main.java.task0.Course;
 import main.java.task0.db.CompositeDBManager;
 import main.java.task0.db.DBManager;
+import main.java.task0.db.LevelDBManager;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -112,8 +113,9 @@ public class Task0GUI {
                                 LocalDate newdate = SimpleDialog.DateDialog.showDialog();
                                 try {
                                     CompositeDBManager.getInstance().insertExam(course.getId(), newdate);
+                                    CompositeDBManager.getInstance().checkConsistency();
                                     SimpleDialog.showConfirmDialog("Exam added successfully");
-                                } catch (SQLException e) {
+                                } catch (Exception e) {
                                     showError(e);
                                 }
                             });
@@ -125,8 +127,9 @@ public class Task0GUI {
                                 try {
                                     CompositeDBManager.getInstance().updateRegistration(reg, mark);
                                     table.update(CompositeDBManager.getInstance().findRegistrationProfessor(formId));
+                                    CompositeDBManager.getInstance().checkConsistency();
                                     SimpleDialog.showConfirmDialog("Mark added successfully");
-                                } catch (SQLException e) {
+                                } catch (Exception e) {
                                     showError(e);
                                 }
                             });
@@ -138,8 +141,9 @@ public class Task0GUI {
                             exam -> {
                                 try {
                                     CompositeDBManager.getInstance().insertRegistration(formId, exam, null);
+                                    CompositeDBManager.getInstance().checkConsistency();
                                     table.update(CompositeDBManager.getInstance().findExam(formId));
-                                } catch (SQLException e) {
+                                } catch (Exception e) {
                                     showError(e);
                                 }
                             });
@@ -149,8 +153,9 @@ public class Task0GUI {
                             reg -> {
                                 try {
                                     CompositeDBManager.getInstance().deleteRegistration(formId, reg.getExam());
+                                    CompositeDBManager.getInstance().checkConsistency();
                                     table.update(CompositeDBManager.getInstance().findRegistrationStudent(formId, true));
-                                } catch (SQLException e) {
+                                } catch (Exception e) {
                                     showError(e);
                                 }
                             });
@@ -160,21 +165,28 @@ public class Task0GUI {
                     table.update(CompositeDBManager.getInstance().findRegistrationStudent(formId, false));
                 }
             }
-        } catch(SQLException ex) {
+        } catch(Exception ex) {
             showError(ex);
         }
     };
 
-    public void showError(SQLException ex) {
+    public void showError(Exception ex) {
         String errString;
 
         if(ex instanceof DBManager.TriggerSQLException)
             errString = ((DBManager.TriggerSQLException)ex).getTriggerMessage();
+        else if(ex instanceof SQLException)
+            errString = "SQLException: " + ((SQLException)ex).getMessage() +
+                    "\nSQLState: " + ((SQLException)ex).getSQLState() +
+                    "\nVendorError: " + ((SQLException)ex).getErrorCode();
+        else if(ex instanceof LevelDBManager.LevelDBUnavailableException)
+            errString = "LevelDB Exception: " + ex.getMessage();
         else
-            errString = "SQLException: " + ex.getMessage() +
-                    "\nSQLState: " + ex.getSQLState() +
-                    "\nVendorError: " + ex.getErrorCode();
+            errString = "Unexpected Exception: " + ex.getMessage();
+
         SimpleDialog.showErrorDialog(errString);
+
+        //ex.printStackTrace();
     }
 
     public VBox getOuterVbox(){return outerVbox;}

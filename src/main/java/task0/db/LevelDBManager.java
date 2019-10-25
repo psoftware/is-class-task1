@@ -1,5 +1,6 @@
 package main.java.task0.db;
 
+import com.sun.istack.internal.Nullable;
 import main.java.task0.*;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
@@ -65,34 +66,37 @@ public class LevelDBManager {
         putKeyValue(studentPrefix + "surname", student.getSurname());
     }
 
-    public void addRegistration(Registration registration) throws LevelDBUnavailableException {
-        exceptionIfNotAvailable();
-
+    public String getRegistrationKey(Registration registration) {
         StringBuilder key = new StringBuilder("");
-        // Format -> registration:studentid:courseid:date:
         // Format -> registration:courseId:date:profId:studentid:
-        key.append("registration:")
+        return key.append("registration:")
                 .append(registration.getExam().getCourse().getId()).append(":")
                 .append(registration.getExam().getDate()).append(":")
                 .append(registration.getExam().getCourse().getProfessor().getId()).append(":")
-                .append(registration.getStudent().getId()).append(":");
+                .append(registration.getStudent().getId()).append(":").toString();
+    }
+
+    public void addRegistration(Registration registration) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
+        String key = getRegistrationKey(registration).toString();
         System.out.println(key);
 
-        putKeyValue(key.toString() + "studentname", registration.getStudent().getName());
-        putKeyValue(key.toString() + "studentsurname", registration.getStudent().getSurname());
-        putKeyValue(key.toString() + "professorname", registration.getExam().getCourse().getProfessor().getName());
-        putKeyValue(key.toString() + "professorsurname", registration.getExam().getCourse().getProfessor().getSurname());
-        putKeyValue(key.toString() + "coursename", registration.getExam().getCourse().getName());
-        putKeyValue(key.toString() + "coursecfu", registration.getExam().getCourse().getCfu());
-        putKeyValue(key.toString() + "grade", registration.getGrade());
+        putKeyValue(key + "studentname", registration.getStudent().getName());
+        putKeyValue(key + "studentsurname", registration.getStudent().getSurname());
+        putKeyValue(key + "professorname", registration.getExam().getCourse().getProfessor().getName());
+        putKeyValue(key + "professorsurname", registration.getExam().getCourse().getProfessor().getSurname());
+        putKeyValue(key + "coursename", registration.getExam().getCourse().getName());
+        putKeyValue(key + "coursecfu", registration.getExam().getCourse().getCfu());
+        putKeyValue(key + "grade", (registration.getGrade() != null) ? registration.getGrade() : -1);
     }
 
     public ArrayList<Registration> findRegistrationProfessor(int professorId) throws LevelDBUnavailableException {
         return findRegistrations(reg -> reg.getExam().getCourse().getProfessor().getId() == professorId);
     }
 
-    public ArrayList<Registration> findRegistrationStudent(int studentId) throws LevelDBUnavailableException {
-        return findRegistrations(reg -> reg.getStudent().getId() == studentId);
+    public ArrayList<Registration> findRegistrationStudent(int studentId, boolean toDo) throws LevelDBUnavailableException {
+        return findRegistrations(reg -> reg.getStudent().getId() == studentId && ((toDo)?reg.getGrade()==null : reg.getGrade()!=null));
     }
 
     // add registration to registration list only if filters returns true
@@ -172,7 +176,10 @@ public class LevelDBManager {
                     case "professorsurname": professor.setSurname(storedValue); break;
                     case "coursename": course.setName(storedValue); break;
                     case "coursecfu": course.setCfu(Integer.parseInt(storedValue)); break;
-                    case "grade" : registration.setGrade(Integer.parseInt(storedValue)); break;
+                    case "grade" :
+                        int grade = Integer.parseInt(storedValue);
+                        registration.setGrade((grade != -1) ? grade : null);
+                        break;
                 }
             }
         } finally {
@@ -189,6 +196,39 @@ public class LevelDBManager {
             conditionalAdd(registrationList, registration, filter);
 
         return registrationList;
+    }
+
+    public void updateRegistration(Registration reg, @Nullable Integer grade) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
+        // this will simply override the registration
+        // TODO: check if registration exists
+        reg.setGrade(grade);
+        addRegistration(reg);
+    }
+
+    public void deleteRegistration(int studentId, Exam exam) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
+        Registration reg = new Registration(new Student(studentId, "",""), exam, -1);
+        String key = getRegistrationKey(reg);
+        db.delete(bytes(key));
+
+        db.delete(bytes(key + "studentname"));
+        db.delete(bytes(key + "studentsurname"));
+        db.delete(bytes(key + "professorname"));
+        db.delete(bytes(key + "professorsurname"));
+        db.delete(bytes(key + "coursename"));
+        db.delete(bytes(key + "coursecfu"));
+        db.delete(bytes(key + "grade"));
+    }
+
+    public void insertRegistration(Student student, Exam exam, @Nullable Integer grade) throws LevelDBUnavailableException {
+        exceptionIfNotAvailable();
+
+        Registration reg = new Registration(student, exam, grade);
+        String key = getRegistrationKey(reg);
+        addRegistration(reg);
     }
 
     public void addExam(Exam exam) throws LevelDBUnavailableException {
@@ -271,6 +311,8 @@ public class LevelDBManager {
     public static void test() throws LevelDBUnavailableException {
         LevelDBManager dbman = LevelDBManager.getInstance();
 
+        System.out.println("-> Test 1: adding registrations");
+
         // Clear db
         dbman.clearAll();
         dbman.dumpAll();
@@ -310,17 +352,35 @@ public class LevelDBManager {
         System.out.println("-> Printing list for findRegistrations");
         List<Registration> regList = dbman.findRegistrations();
         for(Registration r : regList)
-            r.toString();
+            System.out.println(r.toString());
 
         System.out.println("-> Printing list for findRegistrationProfessor");
         regList = dbman.findRegistrationProfessor(1);
         for(Registration r : regList)
-            r.toString();
+            System.out.println(r.toString());
 
         System.out.println("-> Printing list for findRegistrationStudent");
-        regList = dbman.findRegistrationStudent(1);
+        regList = dbman.findRegistrationStudent(1, false);
         for(Registration r : regList)
-            r.toString();
+            System.out.println(r.toString());
+
+        System.out.println("\n-> Test 2: insertRegistration");
+        student.setId(10);
+        student.setName("");
+        student.setSurname("");
+        dbman.insertRegistration(student, e, null);
+        for(Registration r : dbman.findRegistrations())
+            System.out.println(r.toString());
+
+        System.out.println("\n-> Test 3: updateRegistration");
+        dbman.updateRegistration(reg, 27);
+        for(Registration r : dbman.findRegistrations())
+            System.out.println(r.toString());
+
+        System.out.println("\n-> Test 4: deleteRegistration");
+        dbman.deleteRegistration(10, e);
+        for(Registration r : dbman.findRegistrations())
+            System.out.println(r.toString());
 
         //stud = dbman.getStudent(2);
         //System.out.println(stud.getName() + " " + stud.getSurname());

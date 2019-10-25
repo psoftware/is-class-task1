@@ -16,9 +16,11 @@ public class CompositeDBManager {
     private DBManager mysqlDBMan;
     private LevelDBManager levelDBManager;
 
-    public static CompositeDBManager getInstance() throws SQLException {
-        if(INSTANCE == null)
+    public static CompositeDBManager getInstance() throws SQLException, LevelDBUnavailableException {
+        if(INSTANCE == null) {
             INSTANCE = new CompositeDBManager();
+            INSTANCE.importFromMysql();
+        }
         return INSTANCE;
     }
 
@@ -36,31 +38,76 @@ public class CompositeDBManager {
     }
 
     public ArrayList<Registration> findRegistrations() throws SQLException {
-        return mysqlDBMan.findRegistrations();
+        try {
+            return levelDBManager.findRegistrations();
+        } catch (LevelDBUnavailableException e) {
+            return mysqlDBMan.findRegistrations();
+        }
     }
 
     public ArrayList<Registration> findRegistrationProfessor(int id) throws SQLException {
-        return mysqlDBMan.findRegistrationProfessor(id);
+        try {
+            return levelDBManager.findRegistrationProfessor(id);
+        } catch (LevelDBUnavailableException e) {
+            return mysqlDBMan.findRegistrationProfessor(id);
+        }
     }
 
     public ArrayList<Registration> findRegistrationStudent(int id, boolean toDo) throws SQLException {
-        return mysqlDBMan.findRegistrationStudent(id, toDo);
+        try {
+            return levelDBManager.findRegistrationStudent(id, toDo);
+        } catch (LevelDBUnavailableException e) {
+            return mysqlDBMan.findRegistrationStudent(id, toDo);
+        }
     }
 
-    public void updateRegistration(Registration reg, int grade) throws SQLException {
-        mysqlDBMan.updateRegistration(reg, grade);
+    public void updateRegistration(Registration reg, int grade) throws SQLException, LevelDBUnavailableException {
+        mysqlDBMan.getConnection().setAutoCommit(false);
+        try {
+            mysqlDBMan.updateRegistration(reg, grade);
+            levelDBManager.updateRegistration(reg, grade);
+            mysqlDBMan.getConnection().commit();
+        } catch (LevelDBUnavailableException e) {
+            mysqlDBMan.getConnection().rollback();
+            throw e;
+        } finally {
+            mysqlDBMan.getConnection().setAutoCommit(true);
+        }
     }
 
-    public void deleteRegistration(int studentId, Exam exam) throws SQLException {
-        mysqlDBMan.deleteRegistration(studentId, exam);
+    public void deleteRegistration(int studentId, Exam exam) throws SQLException, LevelDBUnavailableException {
+        mysqlDBMan.getConnection().setAutoCommit(false);
+        try {
+            mysqlDBMan.deleteRegistration(studentId, exam);
+            levelDBManager.deleteRegistration(studentId, exam);
+            mysqlDBMan.getConnection().commit();
+        } catch (LevelDBUnavailableException e) {
+            mysqlDBMan.getConnection().rollback();
+            throw e;
+        } finally {
+            mysqlDBMan.getConnection().setAutoCommit(true);
+        }
     }
 
     public ArrayList<Exam> findExam(int studentId) throws SQLException {
         return mysqlDBMan.findExam(studentId);
     }
 
-    public void insertRegistration(int studentId, Exam exam, @Nullable Integer grade) throws SQLException {
-        mysqlDBMan.insertRegistration(studentId, exam, grade);
+    public void insertRegistration(int studentId, Exam exam, @Nullable Integer grade) throws SQLException, LevelDBUnavailableException {
+        mysqlDBMan.getConnection().setAutoCommit(false);
+        try {
+            Student student = mysqlDBMan.findStudent(studentId);
+            if(student == null)
+                throw new IllegalStateException("No student result associated to Student ID");
+            mysqlDBMan.insertRegistration(studentId, exam, grade);
+            levelDBManager.insertRegistration(student, exam, grade);
+            mysqlDBMan.getConnection().commit();
+        } catch (LevelDBUnavailableException e) {
+            mysqlDBMan.getConnection().rollback();
+            throw e;
+        } finally {
+            mysqlDBMan.getConnection().setAutoCommit(true);
+        }
     }
 
     public void close() {
@@ -122,6 +169,15 @@ public class CompositeDBManager {
         return listDeepEqual(DBManager.getInstance().findRegistrations(), LevelDBManager.getInstance().findRegistrations());
     }
 
+    public void checkConsistency() throws SQLException, InconsistentDatabaseException {
+        try {
+            if(!isConsistent())
+                throw new InconsistentDatabaseException("LevelDB/MySQL database is inconsistent! This should not happen");
+        } catch (LevelDBUnavailableException e) {
+            System.out.println("Cannot check consistency: LevelDB is unavailable");
+        }
+    }
+
     public static void main(String[] args) throws SQLException, LevelDBUnavailableException {
         LevelDBManager dbman = LevelDBManager.getInstance();
 
@@ -130,5 +186,11 @@ public class CompositeDBManager {
         System.out.println("-> importFromMysql finished successfully");
 
         dbman.close();
+    }
+
+    public static class InconsistentDatabaseException extends Exception {
+        public InconsistentDatabaseException(String msg) {
+            super(msg);
+        }
     }
 }
