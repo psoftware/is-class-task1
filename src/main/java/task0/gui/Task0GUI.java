@@ -132,7 +132,6 @@ public class Task0GUI {
                                 LocalDate newdate = SimpleDialog.DateDialog.showDialog();
                                 try {
                                     CompositeDBManager.getInstance().insertExam(course.getId(), newdate);
-                                    CompositeDBManager.getInstance().checkConsistency();
                                     SimpleDialog.showConfirmDialog("Exam added successfully");
                                     updateQueryInfoLabel();
                                 } catch (Exception e) {
@@ -147,7 +146,6 @@ public class Task0GUI {
                                 try {
                                     CompositeDBManager.getInstance().updateRegistration(reg, mark);
                                     table.update(CompositeDBManager.getInstance().findRegistrationProfessor(formId));
-                                    CompositeDBManager.getInstance().checkConsistency();
                                     SimpleDialog.showConfirmDialog("Mark added successfully");
                                     updateQueryInfoLabel();
                                 } catch (Exception e) {
@@ -162,7 +160,6 @@ public class Task0GUI {
                             exam -> {
                                 try {
                                     CompositeDBManager.getInstance().insertRegistration(formId, exam, null);
-                                    CompositeDBManager.getInstance().checkConsistency();
                                     table.update(CompositeDBManager.getInstance().findExam(formId));
                                     updateQueryInfoLabel();
                                 } catch (Exception e) {
@@ -175,7 +172,6 @@ public class Task0GUI {
                             reg -> {
                                 try {
                                     CompositeDBManager.getInstance().deleteRegistration(formId, reg.getExam());
-                                    CompositeDBManager.getInstance().checkConsistency();
                                     table.update(CompositeDBManager.getInstance().findRegistrationStudent(formId, true));
                                     updateQueryInfoLabel();
                                 } catch (Exception e) {

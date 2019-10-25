@@ -76,7 +76,8 @@ public class CompositeDBManager {
         }
     }
 
-    public void updateRegistration(Registration reg, int grade) throws SQLException, LevelDBUnavailableException {
+    public void updateRegistration(Registration reg, int grade)
+            throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
         mysqlDBMan.getConnection().setAutoCommit(false);
         try {
             lastExecutor = QueryExecutor.Both;
@@ -88,10 +89,12 @@ public class CompositeDBManager {
             throw e;
         } finally {
             mysqlDBMan.getConnection().setAutoCommit(true);
+            checkConsistency();
         }
     }
 
-    public void deleteRegistration(int studentId, Exam exam) throws SQLException, LevelDBUnavailableException {
+    public void deleteRegistration(int studentId, Exam exam)
+            throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
         mysqlDBMan.getConnection().setAutoCommit(false);
         try {
             lastExecutor = QueryExecutor.Both;
@@ -103,6 +106,7 @@ public class CompositeDBManager {
             throw e;
         } finally {
             mysqlDBMan.getConnection().setAutoCommit(true);
+            checkConsistency();
         }
     }
 
@@ -111,7 +115,8 @@ public class CompositeDBManager {
         return mysqlDBMan.findExam(studentId);
     }
 
-    public void insertRegistration(int studentId, Exam exam, @Nullable Integer grade) throws SQLException, LevelDBUnavailableException {
+    public void insertRegistration(int studentId, Exam exam, @Nullable Integer grade)
+            throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
         mysqlDBMan.getConnection().setAutoCommit(false);
         try {
             lastExecutor = QueryExecutor.Both;
@@ -126,6 +131,7 @@ public class CompositeDBManager {
             throw e;
         } finally {
             mysqlDBMan.getConnection().setAutoCommit(true);
+            checkConsistency();
         }
     }
 
