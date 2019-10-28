@@ -13,10 +13,10 @@
  
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},   
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
+    commentstyle=\color{violet},
+    keywordstyle=\color{red},
     numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
+    stringstyle=\color{codegreen},
     basicstyle=\ttfamily\footnotesize,
     breakatwhitespace=false,         
     breaklines=true,                 
@@ -76,7 +76,7 @@ For clarity the class-diagram is reported.
 \begin{itemize}
 \item \textit{@Entity}, specifies the following class is an entity to be mapped to one or more tables in the DB.
 \item \textit{@Table}, specifies the primary table for the annotated entity. The attribute \textit{name} indicates the referenced table in the DB.
-\item \textit{@Column}, specifies the mapped column for a persistent property or field. The attribute \textit{name} indicates the name of the corresponding table column. It may be neglected when names of the attribute and of the columns are the same. \alert{Note} that if the names are not equal Hinerbate will add a column to the table with name equals to the value if the \textit{name}.
+\item \textit{@Column}, specifies the mapped column for a persistent property or field. The attribute \textit{name} indicates the name of the corresponding table column. It may be neglected when names of the attribute and of the columns are the same.
 \end{itemize}
 \begin{lstlisting}[language=Java, caption=@Entity and @Table]
 @Entity
@@ -225,6 +225,14 @@ public class Course {
 	  */
 }
 \end{lstlisting}
+\end{frame}
+
+\begin{frame}
+	\frametitle{JPQL - Introduction}
+	The Java Persistence Query Language (JPQL) is a platform-independent object-oriented query language defined as part of the Java Persistence API (JPA) specification.
+	\linebreak
+	\linebreak
+	JPQL is used to make queries against entities stored in a relational database. It is heavily inspired by SQL, and its queries resemble SQL queries in syntax, but operate against JPA entity objects rather than directly with database tables.
 \end{frame}
 
 \begin{frame} [fragile]
