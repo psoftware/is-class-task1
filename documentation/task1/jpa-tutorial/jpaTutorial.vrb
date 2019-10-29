@@ -1,0 +1,22 @@
+\frametitle{JPQL - Delete}
+Delete a registration.
+\begin{lstlisting} [language=java]
+public void deleteRegistration(int studentId, Exam exam) {
+	try {
+		entityManager = factory.createEntityManager();
+		entityManager.getTransaction().begin();
+		Query query = entityManager.createQuery("DELETE FROM Registration r WHERE r.exam = :exam AND r.student.id = :studId");
+		query.setParameter("exam", exam);
+		query.setParameter("studId", studentId);
+		query.executeUpdate();
+		entityManager.getTransaction().commit();
+	} catch (Exception ex) {
+		ex.printStackTrace();
+		System.out.println("A problem occurred inserting a registration!");
+		throw ex;
+	} finally {
+		entityManager.close();
+	}
+}
+
+\end{lstlisting}

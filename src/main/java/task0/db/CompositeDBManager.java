@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class CompositeDBManager {
@@ -36,7 +37,7 @@ public class CompositeDBManager {
         return lastExecutor;
     }
 
-    public ArrayList<Course> findCourse(int profID) throws SQLException {
+    public List<Course> findCourse(int profID) throws SQLException {
         lastExecutor = QueryExecutor.MySQL;
         return mysqlDBMan.findCourse(profID);
     }
@@ -46,7 +47,7 @@ public class CompositeDBManager {
         mysqlDBMan.insertExam(courseID, date);
     }
 
-    public ArrayList<Registration> findRegistrations() throws SQLException {
+    public List<Registration> findRegistrations() throws SQLException {
         try {
             lastExecutor = QueryExecutor.LevelDB;
             return levelDBManager.findRegistrations();
@@ -56,7 +57,7 @@ public class CompositeDBManager {
         }
     }
 
-    public ArrayList<Registration> findRegistrationProfessor(int id) throws SQLException {
+    public List<Registration> findRegistrationProfessor(int id) throws SQLException {
         try {
             lastExecutor = QueryExecutor.LevelDB;
             return levelDBManager.findRegistrationProfessor(id);
@@ -66,7 +67,7 @@ public class CompositeDBManager {
         }
     }
 
-    public ArrayList<Registration> findRegistrationStudent(int id, boolean toDo) throws SQLException {
+    public List<Registration> findRegistrationStudent(int id, boolean toDo) throws SQLException {
         try {
             lastExecutor = QueryExecutor.LevelDB;
             return levelDBManager.findRegistrationStudent(id, toDo);
@@ -78,70 +79,64 @@ public class CompositeDBManager {
 
     public void updateRegistration(Registration reg, int grade)
             throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
-        mysqlDBMan.getConnection().setAutoCommit(false);
         try {
+            mysqlDBMan.startTransaction();
             lastExecutor = QueryExecutor.Both;
             mysqlDBMan.updateRegistration(reg, grade);
+            mysqlDBMan.flushTransaction();
             levelDBManager.updateRegistration(reg, grade);
-            mysqlDBMan.getConnection().commit();
+            mysqlDBMan.commitTransaction();
         } catch (Exception e) {
-            mysqlDBMan.getConnection().rollback();
+            mysqlDBMan.rollbackTransaction();
             throw e;
         } finally {
-            mysqlDBMan.getConnection().setAutoCommit(true);
             checkConsistency();
         }
     }
 
     public void deleteRegistration(int studentId, Exam exam)
             throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
-        mysqlDBMan.getConnection().setAutoCommit(false);
         try {
+            mysqlDBMan.startTransaction();
             lastExecutor = QueryExecutor.Both;
             mysqlDBMan.deleteRegistration(studentId, exam);
+            mysqlDBMan.flushTransaction();
             levelDBManager.deleteRegistration(studentId, exam);
-            mysqlDBMan.getConnection().commit();
+            mysqlDBMan.commitTransaction();
         } catch (Exception e) {
-            mysqlDBMan.getConnection().rollback();
+            mysqlDBMan.rollbackTransaction();
             throw e;
         } finally {
-            mysqlDBMan.getConnection().setAutoCommit(true);
             checkConsistency();
         }
     }
 
-    public ArrayList<Exam> findExam(int studentId) throws SQLException {
+    public List<Exam> findExam(int studentId) throws SQLException {
         lastExecutor = QueryExecutor.MySQL;
         return mysqlDBMan.findExam(studentId);
     }
 
     public void insertRegistration(int studentId, Exam exam, @Nullable Integer grade)
             throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
-        mysqlDBMan.getConnection().setAutoCommit(false);
         try {
+            mysqlDBMan.startTransaction();
             lastExecutor = QueryExecutor.Both;
             Student student = mysqlDBMan.findStudent(studentId);
             if(student == null)
                 throw new IllegalStateException("No student result associated to Student ID");
             mysqlDBMan.insertRegistration(studentId, exam, grade);
+            mysqlDBMan.flushTransaction();
             levelDBManager.insertRegistration(student, exam, grade);
-            mysqlDBMan.getConnection().commit();
+            mysqlDBMan.commitTransaction();
         } catch (Exception e) {
-            mysqlDBMan.getConnection().rollback();
+            mysqlDBMan.rollbackTransaction();
             throw e;
         } finally {
-            mysqlDBMan.getConnection().setAutoCommit(true);
             checkConsistency();
         }
     }
 
     public void close() {
-        try {
-            mysqlDBMan.disconnect();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
         levelDBManager.close();
     }
 
@@ -150,7 +145,7 @@ public class CompositeDBManager {
         LevelDBManager dbman = LevelDBManager.getInstance();
         dbman.clearAll();
 
-        ArrayList<Registration> mysqlRegistrations = DBManager.getInstance().findRegistrations();
+        List<Registration> mysqlRegistrations = DBManager.getInstance().findRegistrations();
         for(Registration r : mysqlRegistrations)
             dbman.addRegistration(r);
         dbman.dumpAll();
@@ -160,7 +155,7 @@ public class CompositeDBManager {
             throw new IllegalStateException("LevelDB registration list does not correspond to MySQL one");
     }
 
-    public static boolean listDeepEqual(ArrayList<Registration> list1, ArrayList<Registration> list2) {
+    public static boolean listDeepEqual(List<Registration> list1, List<Registration> list2) {
         //System.out.println("Deepequal debug:");
         if(list1.size() != list2.size())
             return false;

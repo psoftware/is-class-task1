@@ -71,7 +71,7 @@ public class LevelDBManager {
         // Format -> registration:courseId:date:profId:studentid:
         return key.append("registration:")
                 .append(registration.getExam().getCourse().getId()).append(":")
-                .append(registration.getExam().getDate()).append(":")
+                .append(registration.getExam().getId().getDate()).append(":")
                 .append(registration.getExam().getCourse().getProfessor().getId()).append(":")
                 .append(registration.getStudent().getId()).append(":").toString();
     }
@@ -156,7 +156,7 @@ public class LevelDBManager {
                 // if key changed (or it's the first registration)...
                 // (remember that db entries are ordered by key)
                 if(registration == null ||
-                        (courseId != course.getId() || !date.equals(exam.getDate()) || studentId != student.getId())) {
+                        (courseId != course.getId() || !date.equals(exam.getId().getDate()) || studentId != student.getId())) {
                     // we must save the last registration instance (if it is not the first registration)
                     if(registration != null)
                         conditionalAdd(registrationList, registration, filter);
@@ -238,7 +238,7 @@ public class LevelDBManager {
         // Format -> exam:courseid:date:
         key.append("exam:")
                 .append(exam.getCourse().getId()).append(":")
-                .append(exam.getDate()).append(":");
+                .append(exam.getId().getDate()).append(":");
 
         putKeyValue(key.toString(), "");
     }

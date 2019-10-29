@@ -5,6 +5,8 @@
  */
 package main.java.task0;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.Objects;
 
@@ -12,26 +14,74 @@ import java.util.Objects;
  *
  * @author cacomop
  */
+@Entity
+@Table(name = "exam")
 public class Exam {
-    private Date date;
+
+    @Embeddable
+    public static class ExamID implements Serializable {
+        private Date date;
+        private int course;
+
+        public ExamID() {}
+        public ExamID(Date date, int course) {
+            this.date = date;
+            this.course = course;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+        public void setDate(Date date) {
+            this.date = date;
+        }
+
+        public int getCourse() {
+            return course;
+        }
+        public void setCourse(int course) {
+            this.course = course;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj == null || obj.getClass() != this.getClass())
+                return false;
+
+            ExamID examobj = (ExamID)obj;
+            return getDate().equals(examobj.date) && course == examobj.getCourse();
+        }
+
+        //TODO: implement hashcode (is it really necessary?)
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
+    }
+
+    private ExamID id;
+    @EmbeddedId
+    public ExamID getId() {
+        return id;
+    }
+    public void setId(ExamID id) {
+        this.id = id;
+    }
+
+    // ===== Chiave =====
     private Course course;
-    
-    public Exam (Course course, Date date) {
-        this.date = date;
-        this.course = course;
-    }
-    
-    public Date getDate () {
-        return date;
-    }
-    public void setDate(Date date) {
-        this.date = date;
-    }
-    
-    public Course getCourse () {
+
+    @MapsId("course") // TODO: verificare correttezza
+    @JoinColumn(name="course", referencedColumnName="id")
+    @ManyToOne
+    public Course getCourse() {
         return course;
     }
-    public void setCourse(Course course) {
+    public void setCourse(Course course) { this.course = course;}
+
+    public Exam() {}
+    public Exam(Course course, Date date) {
+        this.id = new ExamID(date, course.getId());
         this.course = course;
     }
 
@@ -44,7 +94,7 @@ public class Exam {
 
         Exam exam = (Exam)obj;
         return Objects.equals(exam.getCourse(), this.getCourse())
-                && ((exam.getDate() == this.getDate()) ||
-                (exam.getDate() != null && exam.getDate().toLocalDate().equals(this.getDate().toLocalDate())));
+                && ((exam.getId().getDate() == this.getId().getDate()) ||
+                (exam.getId().getDate() != null && exam.getId().getDate().toLocalDate().equals(this.getId().getDate().toLocalDate())));
     }
 }

@@ -191,18 +191,25 @@ public class Task0GUI {
     };
 
     public void showError(Exception ex) {
-        String errString;
-
-        if(ex instanceof DBManager.TriggerSQLException)
-            errString = ((DBManager.TriggerSQLException)ex).getTriggerMessage();
-        else if(ex instanceof SQLException)
-            errString = "SQLException: " + ((SQLException)ex).getMessage() +
-                    "\nSQLState: " + ((SQLException)ex).getSQLState() +
-                    "\nVendorError: " + ((SQLException)ex).getErrorCode();
-        else if(ex instanceof LevelDBManager.LevelDBUnavailableException)
+        String errString = "Unexpected Exception: " + ex.getMessage();
+        if(ex instanceof LevelDBManager.LevelDBUnavailableException)
             errString = "LevelDB Exception: " + ex.getMessage();
-        else
-            errString = "Unexpected Exception: " + ex.getMessage();
+        else {
+            // Navigate exceptions callback to get the SQLException
+            Exception e = ex;
+            while(e != null && !(e instanceof SQLException))
+                e = (Exception)e.getCause();
+
+            if(e != null) {
+                if(((SQLException)e).getSQLState().equals("02000"))
+                    errString = ((SQLException)e).getMessage();
+                else
+                    errString = "SQLException: " + ((SQLException)ex).getMessage() +
+                            "\nSQLState: " + ((SQLException)ex).getSQLState() +
+                            "\nVendorError: " + ((SQLException)ex).getErrorCode();
+            }
+
+        }
 
         SimpleDialog.showErrorDialog(errString);
 

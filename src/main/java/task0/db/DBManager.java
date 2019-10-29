@@ -8,103 +8,232 @@ package main.java.task0.db;
 import com.sun.istack.internal.Nullable;
 import main.java.task0.*;
 
+import javax.persistence.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author adria
  */
 public class DBManager {
-    private static DBManager INSTANCE;
-
-    private String address;
-    private int port;
-    private String DBName;
-    private String user;
-    private String password;
-    
-    private Connection conn;
-    
-    public DBManager (String address, int port, String DBName, String user, String password) throws SQLException {
-        this.DBName = DBName;
-        this.port = port;
-        this.password = password;
-        this.user = user;
-        this.address = address;
-        
-        connect();
-    }
-
-    public static DBManager getInstance() throws SQLException {
-        if(INSTANCE == null) {
-            INSTANCE = new DBManager("127.0.0.1", 3306, "Task0", "root", "root");
-            INSTANCE.connect();
-        }
+    private static DBManager INSTANCE = new DBManager();
+    public static DBManager getInstance() {
         return INSTANCE;
     }
-    
-    public void connect () throws SQLException {
-        try {
-            String url = "jdbc:mysql://" + address + ":" + Integer.toString(port) + "/" + DBName + "?useLegacyDatetimeCode=false&serverTimezone=Europe/Rome";
-            System.out.println(url);
-            conn = DriverManager.getConnection(url, user, password);
-        } catch (SQLException ex) {
-            TriggerSQLException.handleSqlException(ex);
-        }        
+
+    private EntityManagerFactory factory;
+    private EntityManager entityManager;
+
+    public void setup() {
+        factory = Persistence.createEntityManagerFactory("Task0");
+
     }
 
-    protected Connection getConnection() {
-        return conn;
+    public void exit() {
+        factory.close();
     }
-    
-    public void disconnect () throws SQLException {
-        try {
-            conn.close();
-        } catch (SQLException ex) {
-            TriggerSQLException.handleSqlException(ex);
-        }
+
+    public DBManager() {
+        setup();
     }
-    
-    public ArrayList<Course> findCourse (int profID) throws SQLException {
-        ArrayList<Course> result = null;
+
+    public static void main(String[] args) {
+        DBManager manager = new DBManager();
+
+        for(Course c : manager.findCourse(1))
+            System.out.println("Course ("+c.getCfu()+")" + c.getName() + " of Professor " + c.getProfessor().getName() + " " + c.getProfessor().getSurname());
+
+        for(Exam e : manager.findExam(1))
+            System.out.println(e.getId().getDate() + " " + e.getCourse().getName());
+
+        for(Registration r : manager.findRegistrationProfessor(1))
+            System.out.println(r.getExam().getId().getDate().toString() + " " + r.getExam().getCourse().getName() + ": " + r.getGrade());
+
+        for(Registration r : manager.findRegistrationStudent(1, true))
+            System.out.println(r.getExam().getId().getDate().toString() + " " + r.getExam().getCourse().getName() + ": " + r.getGrade());
+        for(Registration r : manager.findRegistrationStudent(1, false))
+            System.out.println(r.getExam().getId().getDate().toString() + " " + r.getExam().getCourse().getName() + ": " + r.getGrade());
+
+        manager.exit();
+        System.out.println("Finished");
+    }
+
+    public List<Course> findCourse(int profID) {
+        List<Course> resultList;
         try {
-            String sql = "SELECT c.*, pr.* FROM course c INNER JOIN professor pr ON pr.id = professor WHERE professor = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, profID);
-            pstmt.execute();
-            ResultSet rs = pstmt.getResultSet();
-            result = new ArrayList<Course>();
-            while (rs.next()){
-                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
-                Course c = new Course(rs.getInt("id"), rs.getString("name"), rs.getInt("cfu"), professor);
-                result.add(c);
-            }
-        } catch (SQLException ex) {
-            TriggerSQLException.handleSqlException(ex);
+            entityManager = factory.createEntityManager();
+            Query query = entityManager.createQuery("SELECT c FROM Course c WHERE c.professor.id = :profID");
+            query.setParameter("profID", profID);
+            resultList = query.getResultList();
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            entityManager.close();
         }
-        return result;
+
+        return resultList;
+    }
+
+    public List<Exam> findExam(int studId) {
+        List<Exam> resultList;
+        try {
+            entityManager = factory.createEntityManager();
+            Query query = entityManager.createQuery("SELECT e FROM Exam e WHERE (" +
+                    "SELECT count(r) FROM Registration r " +
+                    "WHERE r.student.id = :studId AND r.exam.id = e.id OR (r.exam.course = e.course AND r.grade IS NOT NULL) " +
+                    ") = 0");
+            query.setParameter("studId", studId);
+            resultList = query.getResultList();
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            entityManager.close();
+        }
+
+        return resultList;
+    }
+
+    public List<Registration> findRegistrations() throws SQLException {
+        List<Registration> resultList;
+        try {
+            entityManager = factory.createEntityManager();
+            Query query = entityManager.createQuery("SELECT r FROM Registration r");
+            resultList = query.getResultList();
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            entityManager.close();
+        }
+
+        return resultList;
+    }
+
+    public List<Registration> findRegistrationProfessor(int profId) {
+        List<Registration> resultList;
+        try {
+            entityManager = factory.createEntityManager();
+            Query query = entityManager.createQuery("SELECT r FROM Registration r WHERE r.exam.course.professor.id = :profID");
+            query.setParameter("profID", profId);
+            resultList = query.getResultList();
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            entityManager.close();
+        }
+
+        return resultList;
+    }
+
+    public List<Registration> findRegistrationStudent(int studentId, boolean toDo) {
+        List<Registration> resultList;
+        try {
+            entityManager = factory.createEntityManager();
+            Query query = entityManager.createQuery("SELECT r FROM Registration r WHERE r.student.id = :studentId AND r.grade IS "
+                    + ((toDo) ? "NULL" : "NOT NULL"));
+            query.setParameter("studentId", studentId);
+            resultList = query.getResultList();
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            entityManager.close();
+        }
+
+        return resultList;
     }
 
     public Student findStudent(int studentId) throws SQLException {
-        Student result = null;
         try {
-            String sql = "SELECT s.* FROM student s WHERE s.id = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, studentId);
-            pstmt.execute();
-            ResultSet rs = pstmt.getResultSet();
-            while (rs.next()){
-                // We should get just one row or none
-                result = new Student(rs.getInt("s.id"), rs.getString("s.name"), rs.getString("s.surname"));
-            }
-        } catch (SQLException ex) {
-            TriggerSQLException.handleSqlException(ex);
+            Student student = entityManager.getReference(Student.class, studentId);
+            return student;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("A problem occurred finding a student!");
+            throw ex;
         }
-        return result;
     }
-    
+
+    public void startTransaction() {
+        entityManager = factory.createEntityManager();
+        entityManager.getTransaction().begin();
+    }
+
+    public void flushTransaction() {
+        entityManager.flush();
+    }
+
+    public void commitTransaction() {
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
+    public void rollbackTransaction() {
+        entityManager.getTransaction().rollback();
+        entityManager.close();
+    }
+
+    public void insertExam(int courseID, LocalDate date) {
+        try {
+            entityManager = factory.createEntityManager();
+            entityManager.getTransaction().begin();
+            Course course = entityManager.getReference(Course.class, courseID);
+            Exam exam = new Exam(course, Date.valueOf(date));
+            entityManager.persist(exam);
+            entityManager.getTransaction().commit();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("A problem occurred inserting an exam!");
+            throw ex;
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    public void updateRegistration(Registration reg, int grade) {
+        reg.setGrade(grade);
+
+        try {
+            entityManager.merge(reg);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("A problem occurred inserting a registration!");
+            throw ex;
+        }
+    }
+
+    public void deleteRegistration(int studentId, Exam exam) {
+        try {
+            // Delete
+            Query query = entityManager.createQuery("DELETE FROM Registration r WHERE r.exam = :exam AND r.student.id = :studId");
+            query.setParameter("exam", exam);
+            query.setParameter("studId", studentId);
+            query.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("A problem occurred inserting a registration!");
+            throw ex;
+        }
+    }
+
+    // L'ho fatta io e non l'ho copiata dal codice commentato
+    public void insertRegistration(int studentId, Exam examDetached,  @Nullable Integer grade) {
+        try {
+            Student student = entityManager.getReference(Student.class, studentId);
+            Exam exam = entityManager.getReference(Exam.class, examDetached.getId());
+            Registration registration = new Registration(student, exam, grade);
+
+            entityManager.persist(registration);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("A problem occurred inserting a registration!");
+            throw ex;
+        }
+    }
+
+    /*
+>>>>>>> feat-jpa
     public void insertExam (int courseID, LocalDate date) throws SQLException {
         try {
             String sql = "INSERT INTO exam (course, date) VALUES(?, ?);";
@@ -219,36 +348,6 @@ public class DBManager {
             TriggerSQLException.handleSqlException(ex);
         }
     }
-    
-    public ArrayList<Exam> findExam (int studentId) throws SQLException {
-        ArrayList<Exam> result = null;
-        try {
-            String sql = "SELECT e.course, e.date, c.*, pr.* " +
-                    "FROM exam e INNER JOIN course c ON c.id = e.course INNER JOIN professor pr ON pr.id = c.professor " +
-                    "WHERE NOT EXISTS( SELECT * " +
-                    "FROM exam_result er " +
-                    "WHERE er.student = ? and " +
-                    "       (er.course = e.course " +
-                    "       AND er.date = e.date) " +
-                    "   OR " +
-                    "       (er.course = e.course " +
-                    "       AND er.grade IS NOT NULL));";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, studentId);
-            pstmt.execute();
-            ResultSet rs = pstmt.getResultSet();
-            result = new ArrayList<>();
-            while (rs.next()) {
-                Professor professor = new Professor(rs.getInt("pr.id"), rs.getString("pr.name"), rs.getString("pr.surname"));
-                Course c = new Course(rs.getInt("c.id"), rs.getString("c.name"), rs.getInt("c.cfu"), professor);
-                Exam e = new Exam(c, rs.getDate("e.date"));
-                result.add(e);
-            }
-        } catch (SQLException ex) {
-            TriggerSQLException.handleSqlException(ex);
-        }
-        return result;
-    }
 
     public void insertRegistration (int studentId, Exam exam, @Nullable Integer grade) throws SQLException {
         try {
@@ -292,4 +391,5 @@ public class DBManager {
             TriggerSQLException.ifFromTrigger(ex);
         }
     }
+     */
 }

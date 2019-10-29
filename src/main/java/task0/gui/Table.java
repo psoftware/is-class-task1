@@ -73,7 +73,7 @@ public class Table  extends TableView {
         TableColumn course = new TableColumn("Course");
         TableColumn date = new TableColumn("Date");
         course.setCellValueFactory(MappedTableColumn.<Exam>build(p -> p.getCourse().getName()));
-        date.setCellValueFactory((MappedTableColumn.<Exam>build(p -> p.getDate().toString())));
+        date.setCellValueFactory((MappedTableColumn.<Exam>build(p -> p.getId().getDate().toString())));
         getColumns().addAll(course, date);
 
         if(callback != null) {
@@ -133,7 +133,7 @@ public class Table  extends TableView {
         TableColumn grade = new TableColumn("Grade");
 
         course.setCellValueFactory(MappedTableColumn.<Registration>build(p -> p.getExam().getCourse().getName()));
-        date.setCellValueFactory((MappedTableColumn.<Registration>build(p -> p.getExam().getDate().toString())));
+        date.setCellValueFactory((MappedTableColumn.<Registration>build(p -> p.getExam().getId().getDate().toString())));
         grade.setCellValueFactory(MappedTableColumn.<Registration>build(p -> (p.getGrade() != null) ? Integer.toString(p.getGrade()) : ""));
         getColumns().addAll(course, date, grade);
 
