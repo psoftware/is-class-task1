@@ -1,6 +1,6 @@
 \documentclass{report}
 \usepackage{graphicx}
-\graphicspath{{./images/}}
+\graphicspath{ {./images/} }
 \usepackage[nottoc]{tocbibind}
 \usepackage{blindtext}
 \usepackage{booktabs}% http://ctan.org/pkg/booktabs
@@ -76,25 +76,40 @@ The Student:
 	\item shall not be able to deregister from an exam alredy took
 	\item shall not be able to deregister from an exam after the exam date.
 \end{enumerate}
-
+\addcontentsline{toc}{section}{Non-Functional Requirements}
 \section*{Non-Functional Requirements}
 For the application we identified Consistency and Availability as the two most important non-functional requirements.
 Both the requirements can be satisfied by the use of a RDBMS, since for our application we don't manage high volumes of data. For this reason we employed a MySQL DBMS to implement our back-end
 \newpage
+\addcontentsline{toc}{section}{Use Case Diagram}
 \section*{Use Case Diagram}
-From the funtional requirements, a Use Case Diagram is derived. For more detail and a step-by-step description of the different scenarios, see chapter \textit{User's Manual}.
 \begin{figure}[ht]
-	\includegraphics[width=1\textwidth]{UseCaseDiagram.png}
-	\caption{Use Cases Diagram}
+	\includegraphics[width=0.9\textwidth]{UseCaseDiagram.png}
+	\caption{Use Case Diagram}
 \end{figure}
 
+\begin{itemize}
+	\item \textbf{Add Exam} : This operation can only be performed by a Professor.\\ He/She will be able to browse his/her tenured courses, select the one to add a new exam to and then add it.
+	\item \textbf{Add Grade} : This operation can only be performed by a Professor.\\ He/She will be able to browse the registrations for his/her tenured courses, select the registration to add a grade to and then add it.
+	\item \textbf{Register to Exam} : This operation can only be performed by a Student.\\ He/She will be able to browse all the exams to which is possible to register, select one and perform the registration.
+	\item \textbf{Deregister to Exam} : This operation can only be performed by a Student.\\ He/She will be able to browse his/her active registrations, select one and deregister from it.
+	\item \textbf{See Grades} : This operation can only be performed by a Student.\\ He/She will be able to browse his/her registrations and show only the one with a sufficient.
+\end{itemize}
+For more detail and a step-by-step description of the different scenarios, see chapter \textit{User's Manual}.
+\newpage
 
-
-
-\addcontentsline{toc}{chapter}{Entity-Relationship Diagram}
-\chapter*{Entity-Relationship Diagram}
+\addcontentsline{toc}{chapter}{UML Class and Entity-Relationship Diagrams}
+\chapter*{UML Class and Entity-Relationship Diagrams}
+\addcontentsline{toc}{section}{UML Class Diagram}
+\section*{UML Class Diagram} 
+The UML Class Diagram shows the main objects involved in our application, with the respective logical relationships.
+\begin{figure}[ht]
+	\includegraphics[width=0.6\textwidth]{ClassDiagram.png}
+	\caption{UML Class Diagram}
+\end{figure} 
+From this model we derived an Entity-Relationship Diagram, where the dependecies are more deeply identified. Finally we will show the final database schema implemented on the MySQL RDBMS.
 \addcontentsline{toc}{section}{ER Vocabulary}
-\section*{ER Vocabulary}
+\section*{ER Diagram}
 \subsection*{Names definition}
 Here we define in detail the terms for the main entites and relationships we will use in the following:
 \begin{itemize}
@@ -104,7 +119,7 @@ Here we define in detail the terms for the main entites and relationships we wil
 	\item \textit{Exam}\\ An exam represents the actual date of the examination for a course.
 	\item \textit{Exam Result} An exam result relates an exam to all the students who registered to that exam, adding the information of the grade, if meaningful.\\
 \end{itemize} 
-
+\newpage
 \subsection*{Entities}
 \begin{table}[ht]
 	\centering
@@ -134,9 +149,7 @@ Here we define in detail the terms for the main entites and relationships we wil
 		\hline
 	\end{tabular}
 \end{table}
-
-\newpage
-
+\vspace{10em}
 \subsection*{Relationships}
 \begin{table}[h]
 	\centering
@@ -160,19 +173,20 @@ Here we define in detail the terms for the main entites and relationships we wil
 \end{table}
 \vspace{5em}
 \addcontentsline{toc}{section}{ER Diagram}
+\newpage
 \section*{ER Diagram}
 \vspace{2em}
 \begin{figure}[ht]
-	\includegraphics[width=1\textwidth]{ER_Diagram.png}
+	\includegraphics[width=0.9\textwidth]{ER_Diagram.png}
 	\caption{Entity - Relationship Diagram}
 \end{figure}
-
-\addcontentsline{toc}{chapter}{UML Class Diagram}
-\chapter*{UML Class Diagram} 
+\addcontentsline{toc}{section}{Database Implementation}
+\section*{Database Implementation}
 \begin{figure}[ht]
-	\includegraphics[width=1\textwidth]{ClassDiagram.png}
-	\caption{Entity - Relationship Diagram}
-\end{figure} 
+	\includegraphics[width=0.85\textwidth]{mysqlSchema.png}
+	\caption{MySQL Schema}
+\end{figure}
+
 
 \addcontentsline{toc}{chapter}{User's Manual}
 \chapter*{User's Manual}
@@ -192,7 +206,7 @@ composed of:
 		\item Student, in case the user is a Student.
 	\end{enumerate} 
 	\item \textit{What do you want to do?} choise box, where the user specifies the action he wants to perform. The options change according to the role chosen.
-Professor can select among:
+	Professor can select among:
 	\begin{enumerate}
 		\item \textit{Add Exam} if he wants to add an exam;
 		\item \textit{Add Grade} if he wants to add a grade.
@@ -229,7 +243,7 @@ If the Professor select the \textit{Add Exam} option, the table, fig. \ref{fig:A
 	\item \textit{Add Exam Date}, button the professor has to push in order to add an exam corresponding to the course. 
 \end{itemize}
 
-If the Professor pushes one of the \textit{Add Exam Date} buttons a confirm dialog is presented and it asks for the date of the exam to insert, fig. \ref{fig:AddExamDialog}.
+If the Professor pushes one of the \textit{Add Exam Date} buttons a confirm dialog is presented and it asks for the date of the exam to insert, fig. \ref{fig:AddExamDialog.png}.
 \begin{figure} [h!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{AddExamDialog.png}
@@ -321,9 +335,5 @@ If the Student select the \textit{See Grades} option, the table, fig. \ref{fig:S
 	\item \textit{Date}, the date when the student passed the exam;
 	\item \textit{Grade}, the grade the Student got. 
 \end{itemize}
-
-
-\begin{thebibliography}{9}
-\end{thebibliography}
 
 \end{document}

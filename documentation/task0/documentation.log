@@ -1,87 +1,93 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.10.24)  24 OCT 2019 17:13
+This is XeTeX, Version 3.14159265-2.6-0.999991 (MiKTeX 2.9.7200 64-bit) (preloaded format=xelatex 2019.10.25)  25 OCT 2019 09:51
 entering extended mode
- restricted \write18 enabled.
- %&-line parsing enabled.
-**documentation.tex
-(./documentation.tex
-LaTeX2e <2017-04-15>
-Babel <3.18> and hyphenation patterns for 9 language(s) loaded.
-(/usr/share/texlive/texmf-dist/tex/latex/base/report.cls
-Document Class: report 2014/09/29 v1.4h Standard LaTeX document class
-(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
-File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+**./documentation.tex
+(documentation.tex
+LaTeX2e <2019-10-01>
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\report.cls"
+Document Class: report 2019/08/27 v1.4j Standard LaTeX document class
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\size10.clo"
+File: size10.clo 2019/08/27 v1.4j Standard LaTeX file (size option)
 )
-\c@part=\count79
-\c@chapter=\count80
-\c@section=\count81
-\c@subsection=\count82
-\c@subsubsection=\count83
-\c@paragraph=\count84
-\c@subparagraph=\count85
-\c@figure=\count86
-\c@table=\count87
+\c@part=\count80
+\c@chapter=\count81
+\c@section=\count82
+\c@subsection=\count83
+\c@subsubsection=\count84
+\c@paragraph=\count85
+\c@subparagraph=\count86
+\c@figure=\count87
+\c@table=\count88
 \abovecaptionskip=\skip41
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\graphicx.
+sty"
 Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
 
-(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\keyval.st
+y"
 Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \KV@toks@=\toks14
 )
-(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
-Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\graphics.
+sty"
+Package: graphics 2019/07/20 v1.3b Standard LaTeX Graphics (DPC,SPQR)
 
-(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics\trig.sty"
 Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
 )
-(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-cfg\graph
+ics.cfg"
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: pdftex.def on input line 99.
+Package graphics Info: Driver file: xetex.def on input line 105.
 
-(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
-File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-def\xetex
+.def"
+File: xetex.def 2017/06/24 v5.0h Graphics/color driver for xetex
 ))
 \Gin@req@height=\dimen103
 \Gin@req@width=\dimen104
 )
-(/usr/share/texlive/texmf-dist/tex/latex/tocbibind/tocbibind.sty
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tocbibind\tocbibin
+d.sty"
 Package: tocbibind 2010/10/13 v1.5k extra ToC listings
 Package tocbibind Info: The document has chapter divisions on input line 50.
 
 
 Package tocbibind Note: Using chapter style headings, unless overridden.
 
-) (/usr/share/texlive/texmf-dist/tex/latex/blindtext/blindtext.sty
+)
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/blindtext\blindtex
+t.sty"
 Package: blindtext 2012/01/06 V2.0 blindtext-Package
 
-(/usr/share/texlive/texmf-dist/tex/latex/tools/xspace.sty
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\xspace.sty"
 Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
 )
-\c@blindtext=\count88
-\c@Blindtext=\count89
-\c@blind@countparstart=\count90
-\blind@countxx=\count91
-\blindtext@numBlindtext=\count92
-\blind@countyy=\count93
-\c@blindlist=\count94
-\c@blindlistlevel=\count95
-\c@blindlist@level=\count96
-\blind@listitem=\count97
-\c@blind@listcount=\count98
-\c@blind@levelcount=\count99
-\blind@mathformula=\count100
-\blind@Mathformula=\count101
-\c@blind@randomcount=\count102
-\c@blind@randommax=\count103
-\c@blind@pangramcount=\count104
-\c@blind@pangrammax=\count105
+\c@blindtext=\count89
+\c@Blindtext=\count90
+\c@blind@countparstart=\count91
+\blind@countxx=\count92
+\blindtext@numBlindtext=\count93
+\blind@countyy=\count94
+\c@blindlist=\count95
+\c@blindlistlevel=\count96
+\c@blindlist@level=\count97
+\blind@listitem=\count98
+\c@blind@listcount=\count99
+\c@blind@levelcount=\count100
+\blind@mathformula=\count101
+\blind@Mathformula=\count102
+\c@blind@randomcount=\count103
+\c@blind@randommax=\count104
+\c@blind@pangramcount=\count105
+\c@blind@pangrammax=\count106
 )
-(/usr/share/texlive/texmf-dist/tex/latex/booktabs/booktabs.sty
-Package: booktabs 2016/04/27 v1.618033 publication quality tables
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/booktabs\booktabs.
+sty"
+Package: booktabs 2019/10/08 v1.6180339 publication quality tables
 \heavyrulewidth=\dimen105
 \lightrulewidth=\dimen106
 \cmidrulewidth=\dimen107
@@ -92,30 +98,34 @@ Package: booktabs 2016/04/27 v1.618033 publication quality tables
 \cmidrulesep=\dimen112
 \cmidrulekern=\dimen113
 \defaultaddspace=\dimen114
-\@cmidla=\count106
-\@cmidlb=\count107
+\@cmidla=\count107
+\@cmidlb=\count108
 \@aboverulesep=\dimen115
 \@belowrulesep=\dimen116
-\@thisruleclass=\count108
-\@lastruleclass=\count109
+\@thisruleclass=\count109
+\@lastruleclass=\count110
 \@thisrulewidth=\dimen117
 )
-(/usr/share/texlive/texmf-dist/tex/latex/geometry/geometry.sty
-Package: geometry 2010/09/12 v5.6 Page Geometry
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/geometry\geometry.
+sty"
+Package: geometry 2018/04/16 v5.8 Page Geometry
 
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifpdf.sty
-Package: ifpdf 2017/03/15 v3.2 Provides the ifpdf switch
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\ifpdf.s
+ty"
+Package: ifpdf 2018/09/07 v3.3 Provides the ifpdf switch
 )
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifvtex.sty
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/generic/oberdiek\ifvtex.
+sty"
 Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
 Package ifvtex Info: VTeX not detected.
 )
-(/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/generic/ifxetex\ifxetex.
+sty"
 Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 )
-\Gm@cnth=\count110
-\Gm@cntv=\count111
-\c@Gm@tempcnt=\count112
+\Gm@cnth=\count111
+\Gm@cntv=\count112
+\c@Gm@tempcnt=\count113
 \Gm@bindingoffset=\dimen118
 \Gm@wd@mp=\dimen119
 \Gm@odd@mp=\dimen120
@@ -125,19 +135,24 @@ Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 \Gm@layouthoffset=\dimen124
 \Gm@layoutvoffset=\dimen125
 \Gm@dimlist=\toks15
-)
+
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/xelatex/xetexconfig\geom
+etry.cfg"))
 
 Package geometry Warning: Over-specification in `h'-direction.
     `width' (483.69684pt) is ignored.
 
-(/usr/share/texlive/texmf-dist/tex/latex/tools/array.sty
-Package: array 2016/10/06 v2.4d Tabular extension package (FMi)
+("C:\Users\adria\AppData\Local\Programs\MiKTeX 2.9\tex/latex/tools\array.sty"
+Package: array 2019/08/31 v2.4l Tabular extension package (FMi)
 \col@sep=\dimen126
+\ar@mcellbox=\box27
 \extrarowheight=\dimen127
 \NC@list=\toks16
 \extratabsurround=\skip43
 \backup@length=\skip44
-) (./documentation.aux)
+\ar@cellbox=\box28
+)
+(documentation.aux)
 \openout1 = `documentation.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
@@ -148,76 +163,13 @@ LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
 LaTeX Font Info:    ... okay on input line 18.
 LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
 LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
 LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
 LaTeX Font Info:    ... okay on input line 18.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
 LaTeX Font Info:    ... okay on input line 18.
-(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
-[Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count113
-\scratchdimen=\dimen128
-\scratchbox=\box26
-\nofMPsegments=\count114
-\nofMParguments=\count115
-\everyMPshowfont=\toks17
-\MPscratchCnt=\count116
-\MPscratchDim=\dimen129
-\MPnumerator=\count117
-\makeMPintoPDFobject=\count118
-\everyMPtoPDFconversion=\toks18
-) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
-Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
 
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
-Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
-)
-(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty
-Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
-
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
-Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
-
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
-Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
-)))
-(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
-Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
-
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
-Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
-
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/etexcmds.sty
-Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
-
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifluatex.sty
-Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
-Package ifluatex Info: LuaTeX not detected.
-)
-Package etexcmds Info: Could not find \expanded.
-(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
-(etexcmds)             that some package has redefined \expanded.
-(etexcmds)             In the latter case, load this package earlier.
-)))
-(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
-Package: pdftexcmds 2018/01/21 v0.26 Utility functions of pdfTeX for LuaTeX (HO
-)
-Package pdftexcmds Info: LuaTeX not detected.
-Package pdftexcmds Info: \pdf@primitive is available.
-Package pdftexcmds Info: \pdf@ifprimitive is available.
-Package pdftexcmds Info: \pdfdraftmode found.
-)
-Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
-38.
-Package grfext Info: Graphics extension search list:
-(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
-G,.JBIG2,.JB2,.eps]
-(grfext)             \AppendGraphicsExtensions on input line 456.
-
-(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
-File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
-e
-))
-*geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
 * driver: pdftex
@@ -251,15 +203,11 @@ e
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-<./images/unipi.png, id=1, 289.08pt x 153.57375pt>
-File: ./images/unipi.png Graphic file (type png)
-<use ./images/unipi.png>
-Package pdftex.def Info: ./images/unipi.png  used on input line 21.
-(pdftex.def)             Requested size: 213.39568pt x 113.36627pt.
+File: ./images/unipi.png Graphic file (type bmp)
+<./images/unipi.png>
 [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./images/unipi.png>]
-(./documentation.toc
+] (documentation.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 4.
 LaTeX Font Info:    External font `cmex10' loaded for size
@@ -270,154 +218,102 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
  [1
 
-] (./documentation.lof)
+] (documentation.lof)
 \tf@lof=\write4
 \openout4 = `documentation.lof'.
 
  [2
 
-]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 43.
-
-(/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 43.
- [3
+] [3
 
 ] [4
 
 ]
-<./images/UseCaseDiagram.png, id=26, 833.1125pt x 653.44125pt>
-File: ./images/UseCaseDiagram.png Graphic file (type png)
-<use ./images/UseCaseDiagram.png>
-Package pdftex.def Info: ./images/UseCaseDiagram.png  used on input line 87.
-(pdftex.def)             Requested size: 426.79135pt x 334.74623pt.
- [5 <./images/UseCaseDiagram.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 105--106
+File: ./images/UseCaseDiagram.png Graphic file (type bmp)
+<./images/UseCaseDiagram.png>
+ [5]
+File: ./images/ClassDiagram.png Graphic file (type bmp)
+<./images/ClassDiagram.png>
+
+Underfull \hbox (badness 10000) in paragraph at lines 120--121
 
  []
 
 [6
 
 ]
-Overfull \hbox (2.99399pt too wide) in paragraph at lines 145--145
-[]|\OT1/cmr/bx/n/10 Relationship| 
+Overfull \hbox (2.99pt too wide) in paragraph at lines 158--158
+[]|\TU/lmr/bx/n/10 Relationship| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 155--155
-[]|\OT1/cmr/m/n/10 Exam Date
+Underfull \hbox (badness 10000) in paragraph at lines 168--168
+[]|\TU/lmr/m/n/10 Exam Date
  []
 
-<./images/ER_Diagram.png, id=37, 675.52374pt x 451.6875pt>
-File: ./images/ER_Diagram.png Graphic file (type png)
-<use ./images/ER_Diagram.png>
-Package pdftex.def Info: ./images/ER_Diagram.png  used on input line 166.
-(pdftex.def)             Requested size: 426.79135pt x 285.3779pt.
-[7 <./images/ER_Diagram.png>]
-<./images/ClassDiagram.png, id=42, 482.80376pt x 312.16624pt>
-File: ./images/ClassDiagram.png Graphic file (type png)
-<use ./images/ClassDiagram.png>
-Package pdftex.def Info: ./images/ClassDiagram.png  used on input line 173.
-(pdftex.def)             Requested size: 426.79135pt x 275.95988pt.
- [8
-
- <./images/ClassDiagram.png>]
-<./images/UIStart.png, id=47, 652.4375pt x 582.175pt>
-File: ./images/UIStart.png Graphic file (type png)
-<use ./images/UIStart.png>
-Package pdftex.def Info: ./images/UIStart.png  used on input line 182.
-(pdftex.def)             Requested size: 298.75264pt x 266.58675pt.
+[7]
+File: ./images/ER_Diagram.png Graphic file (type bmp)
+<./images/ER_Diagram.png>
+File: ./images/mysqlSchema.png Graphic file (type bmp)
+<./images/mysqlSchema.png>
+ [8]
+File: ./images/UIStart.png Graphic file (type bmp)
+<./images/UIStart.png>
  [9
 
- <./images/UIStart.png>]
-<./images/AddExam.png, id=52, 650.43pt x 581.17125pt>
-File: ./images/AddExam.png Graphic file (type png)
-<use ./images/AddExam.png>
-Package pdftex.def Info: ./images/AddExam.png  used on input line 221.
-(pdftex.def)             Requested size: 298.75264pt x 266.94296pt.
-<./images/AddExamDialog.png, id=53, 404.51125pt x 174.6525pt>
-File: ./images/AddExamDialog.png Graphic file (type png)
-<use ./images/AddExamDialog.png>
-Package pdftex.def Info: ./images/AddExamDialog.png  used on input line 235.
-(pdftex.def)             Requested size: 213.39568pt x 92.1363pt.
+]
+File: ./images/AddExam.png Graphic file (type bmp)
+<./images/AddExam.png>
+
+
+LaTeX Warning: Reference `fig:AddExamDialog.png' on page 10 undefined on input 
+line 246.
+
+File: ./images/AddExamDialog.png Graphic file (type bmp)
+<./images/AddExamDialog.png>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+File: ./images/AddGrade.png Graphic file (type bmp)
+<./images/AddGrade.png>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[10]
+File: ./images/AddGradeDialog.png Graphic file (type bmp)
+<./images/AddGradeDialog.png>
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<./images/AddGrade.png, id=54, 653.44125pt x 582.175pt>
-File: ./images/AddGrade.png Graphic file (type png)
-<use ./images/AddGrade.png>
-Package pdftex.def Info: ./images/AddGrade.png  used on input line 249.
-(pdftex.def)             Requested size: 298.75264pt x 266.16924pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[10 <./images/AddExam.png>]
-<./images/AddGradeDialog.png, id=60, 379.4175pt x 174.6525pt>
-File: ./images/AddGradeDialog.png Graphic file (type png)
-<use ./images/AddGradeDialog.png>
-Package pdftex.def Info: ./images/AddGradeDialog.png  used on input line 262.
-(pdftex.def)             Requested size: 213.39568pt x 98.23112pt.
+[11]
+File: ./images/RegisterToExam.png Graphic file (type bmp)
+<./images/RegisterToExam.png>
+File: ./images/DeregisterToExam.png Graphic file (type bmp)
+<./images/DeregisterToExam.png>
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[11 <./images/AddExamDialog.png> <./images/AddGrade.png>]
-<./images/RegisterToExam.png, id=66, 628.3475pt x 581.17125pt>
-File: ./images/RegisterToExam.png Graphic file (type png)
-<use ./images/RegisterToExam.png>
-Package pdftex.def Info: ./images/RegisterToExam.png  used on input line 285.
-(pdftex.def)             Requested size: 298.75264pt x 276.31638pt.
-<./images/DeregisterToExam.png, id=67, 649.42625pt x 580.1675pt>
-File: ./images/DeregisterToExam.png Graphic file (type png)
-<use ./images/DeregisterToExam.png>
-Package pdftex.def Info: ./images/DeregisterToExam.png  used on input line 300.
-
-(pdftex.def)             Requested size: 298.75264pt x 266.89798pt.
+[12]
+File: ./images/SeeGrades.png Graphic file (type bmp)
+<./images/SeeGrades.png>
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[12 <./images/AddGradeDialog.png> <./images/RegisterToExam.png>]
-<./images/SeeGrades.png, id=74, 651.43375pt x 582.175pt>
-File: ./images/SeeGrades.png Graphic file (type png)
-<use ./images/SeeGrades.png>
-Package pdftex.def Info: ./images/SeeGrades.png  used on input line 315.
-(pdftex.def)             Requested size: 298.75264pt x 266.99538pt.
+[13] [14] (documentation.aux)
 
+LaTeX Warning: There were undefined references.
 
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[13 <./images/DeregisterToExam.png>] [14 <./images/SeeGrades.png>]
-
-LaTeX Warning: Empty `thebibliography' environment on input line 327.
-
-[15
-
-] (./documentation.aux) ) 
+ ) 
 Here is how much of TeX's memory you used:
- 2383 strings out of 494805
- 35239 string characters out of 6177999
- 99140 words of memory out of 5000000
- 5678 multiletter control sequences out of 15000+600000
- 7972 words of font info for 28 fonts, out of 8000000 for 9000
- 81 hyphenation exceptions out of 8191
- 41i,12n,28p,280b,227s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsf
-onts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcs
-c10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pf
-b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr
-/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/share
-/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texli
-ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on documentation.pdf (16 pages, 409570 bytes).
-PDF statistics:
- 113 PDF objects out of 1000 (max. 8388607)
- 62 compressed objects within 1 object stream
- 0 named destinations out of 1000 (max. 500000)
- 61 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1655 strings out of 427242
+ 23113 string characters out of 3141499
+ 101152 words of memory out of 3000000
+ 6131 multiletter control sequences out of 15000+200000
+ 3760 words of font info for 29 fonts, out of 3000000 for 9000
+ 1348 hyphenation exceptions out of 8191
+ 28i,11n,28p,276b,210s stack positions out of 5000i,500n,10000p,200000b,50000s
 
+Output written on documentation.pdf (15 pages).
