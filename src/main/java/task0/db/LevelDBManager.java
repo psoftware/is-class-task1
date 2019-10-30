@@ -30,7 +30,7 @@ public class LevelDBManager {
     public LevelDBManager()  {
         try {
             Options options = new Options();
-            db = factory.open(new File("../database.leveldb"), options);
+            db = factory.open(new File("database.leveldb"), options);
             setAvailability(true);
         } catch (IOException e) {
             e.printStackTrace();
