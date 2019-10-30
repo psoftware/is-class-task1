@@ -1,6 +1,6 @@
 package main.java.task0.db;
 
-import com.sun.istack.internal.Nullable;
+import org.jetbrains.annotations.Nullable;
 import main.java.task0.*;
 import main.java.task0.db.LevelDBManager.*;
 
