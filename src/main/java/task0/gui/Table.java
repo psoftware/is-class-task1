@@ -3,7 +3,7 @@ package main.java.task0.gui;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.sun.istack.internal.Nullable;
+import org.jetbrains.annotations.Nullable;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
