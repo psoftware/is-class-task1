@@ -6,7 +6,7 @@
 
     <groupId>com.isproject.task0</groupId>
     <artifactId>Task0</artifactId>
-    <version>1.0</version>
+    <version>1.0-leveldb</version>
 
     <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
     <dependencies>
