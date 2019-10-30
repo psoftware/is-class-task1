@@ -130,6 +130,8 @@ public class Task0GUI {
                     table.setTableCourses("Add Exam Date",
                             course -> {
                                 LocalDate newdate = SimpleDialog.DateDialog.showDialog();
+                                if(newdate == null)
+                                    return;
                                 try {
                                     CompositeDBManager.getInstance().insertExam(course.getId(), newdate);
                                     SimpleDialog.showConfirmDialog("Exam added successfully");
@@ -142,7 +144,9 @@ public class Task0GUI {
                 } else if (action.equals("Add Grade")) {
                     table.setTableExamResults("Insert Mark", true,
                             reg -> {
-                                int mark = SimpleDialog.MarkDialog.showDialog();
+                                Integer mark = SimpleDialog.MarkDialog.showDialog();
+                                if(mark == null)
+                                    return;
                                 try {
                                     CompositeDBManager.getInstance().updateRegistration(reg, mark);
                                     table.update(CompositeDBManager.getInstance().findRegistrationProfessor(formId));
