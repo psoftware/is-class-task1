@@ -1,6 +1,6 @@
 package main.java.task0.db;
 
-import com.sun.istack.internal.Nullable;
+import org.jetbrains.annotations.Nullable;
 import main.java.task0.*;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
@@ -30,7 +30,7 @@ public class LevelDBManager {
     public LevelDBManager()  {
         try {
             Options options = new Options();
-            db = factory.open(new File("../database.leveldb"), options);
+            db = factory.open(new File("database.leveldb"), options);
             setAvailability(true);
         } catch (IOException e) {
             e.printStackTrace();
