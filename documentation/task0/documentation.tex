@@ -14,6 +14,10 @@
 	top=20mm,
 }
 \usepackage{array}
+\usepackage{listings}
+\lstset{
+	tabsize=3
+}
 
 \begin{document}
 	\begin{titlepage}
@@ -187,6 +191,196 @@ Here we define in detail the terms for the main entites and relationships we wil
 	\caption{MySQL Schema}
 \end{figure}
 
+
+\addcontentsline{toc}{chapter}{Implementation}
+\chapter*{Implementation}
+Project implementation is based on two main packages, \textit{task.db} and \textit{task.gui}, and database class objects implementation.
+\section*{task.db package}
+This package includes only one class, \textit{DBManager}, which is based on Singleton design pattern. Each method implements a CRUD operation on MySQL database using jpa api methods. A list of all the methods:
+\begin{itemize}
+	\item public List\(<\)Course\(>\) findCourse(int profID); \newline find all courses given a professor ID
+	\item public List\(<\)Exam\(>\) findExam(int studId); \newline find all exams registered by a student indentified by its ID 
+	\item public List\(<\)Registration\(>\) findRegistrationProfessor(int profId); \newline find all registrations opened by professor identified by the parameter ID
+	\item public List\(<\)Registration\(>\) findRegistrationStudent(int studentId, boolean toDo); \newline find all registrations applied to student identified by student ID. If toDo is true, show only registrations without grade, otherwise return all registration with grade
+	\item public void insertExam(int courseID, LocalDate date); \newline add exam for specified courseID at specified date
+	\item public void insertRegistration(int studentId, Exam examDetached, @Nullable Integer grade); \newline insert registration for specified student and exam (can be detached from jpa context). grade can be null, in that case it means that a registration is inserted without a grade
+	\item public void updateRegistration(Registration reg, int grade); \newline update grade to a registration
+	\item public void deleteRegistration(int studentId, Exam exam); \newline delete registration given its key (composite key of studentid + exam)
+\end{itemize}
+
+\subsection*{Implementation of findRegistrationStudent(int studentId, boolean toDo)}
+This implementation and the following one use JPQL language instead of SQL.
+\begin{lstlisting}
+public List<Registration> findRegistrationStudent(int studentId, boolean toDo) {
+List<Registration> resultList;
+	try {
+		entityManager = factory.createEntityManager();
+		Query query =
+			entityManager.createQuery("SELECT r FROM Registration r " +
+			"WHERE r.student.id = :studentId AND r.grade IS "
+			+ ((toDo) ? "NULL" : "NOT NULL"));
+		query.setParameter("studentId", studentId);
+		resultList = query.getResultList();
+	} catch (Exception ex) {
+		throw ex; // Let GUI show the exception
+	} finally {
+		entityManager.close();
+	}
+
+	return resultList;
+}
+\end{lstlisting}
+
+\subsection*{Implementation of findExam(int studId)}
+\begin{lstlisting}
+public List<Exam> findExam(int studId) {
+	List<Exam> resultList;
+	try {
+		entityManager = factory.createEntityManager();
+		Query query = entityManager.createQuery("SELECT e FROM Exam e "+
+			"WHERE (SELECT count(r) FROM Registration r " +
+			"WHERE r.student.id = :studId AND r.exam.id = e.id " +
+			"OR (r.exam.course = e.course AND r.grade IS NOT NULL) " +
+			") = 0");
+		query.setParameter("studId", studId);
+		resultList = query.getResultList();
+	} catch (Exception ex) {
+		throw ex;
+	} finally {
+		entityManager.close();
+	}
+
+	return resultList;
+}
+\end{lstlisting}
+
+\section*{task.gui package}
+Includes classes related to gui implementation, implemented using JavaFX API.
+
+\section*{Database object files}
+Database objects implementation derived from Task0 have been converted to a JPA implementation. Although this phase should have been a simple annotation task, it caused some issues with composite keys implementation. JPA requires that each composite key should be implemented as an @Embeddable class and instanced into the main object class with a @EmbeddedID reference (check tutorial for more details). In addition to this, each composite key member should have a duplicated reference inside the main class, annotated with @MapsID, which realizes the relation of composite key members. Also, JPA specification requires that each entity class must implement a costructor with no parameters. We choosed also to use every annotation on getter and setter methods instead of entity class members, although it does not make any difference, apart from be able to intercept every get and set operation made by JPA, which in any case we don't use. Student and Professor implementation is straighforward.
+
+\subsection*{Student}
+\begin{lstlisting}[language=Java]
+import javax.persistence.*;
+
+@Entity
+@Table(name = "student")
+public class Student {
+	private int id;
+	private String name;
+	private String surname;
+
+	public Student() {}
+
+	public Student(int id, String name, String surname) {
+		this.id = id;
+		this.name = name;
+		this.surname = surname;
+	}
+
+	@Column(name = "id")
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public int getId() { return id; }
+
+	public void setId(int id) { this.id = id; }
+	public String getName() { return name; }
+	public void setName(String name) { this.name = name; }
+	public String getSurname() { return surname; }
+	public void setSurname(String surname) { this.surname = surname; }
+}
+\end{lstlisting}
+Professor implementation is similar to this.
+
+
+\subsection*{Registration}
+\begin{lstlisting}
+import javax.persistence.*;
+import java.io.Serializable;
+import java.sql.Date;
+
+@Entity
+@Table(name = "exam_result")
+public class Registration {
+
+	@Embeddable
+	public static class RegistrationId implements Serializable {
+		private int student;
+		private Exam.ExamID exam;
+
+		public RegistrationId() {}
+
+		public int getStudent() { return student; }
+		public void setStudent(int student) { this.student = student; }
+		public Exam.ExamID getExam() { return this.exam; }
+		public void setExam(Exam.ExamID exam) { this.exam = exam; }
+
+		@Override
+		public boolean equals(Object obj) {
+			if(obj == null || obj.getClass() != this.getClass())
+				return false;
+
+			RegistrationId regobj = (RegistrationId)obj;
+			return student == regobj.getStudent()
+				&& exam.equals(regobj.getExam());
+		}
+
+		// hashcode should be implemented in case of using
+		// @OneToMany relations using HashMaps
+		@Override
+		public int hashCode() {
+			return super.hashCode();
+		}
+	}
+
+
+
+	public Registration () {}
+	public Registration (Student student, Exam exam, Integer grade) {
+		this.exam = exam;
+		this.grade = grade;
+		this.student = student;
+		this.id = new RegistrationId();
+		this.id.setExam(exam.getId());
+		this.id.setStudent(student.getId());
+	}
+
+	private RegistrationId id;
+	@EmbeddedId
+	public RegistrationId getId() { return id; }
+	public void setId(RegistrationId id) { this.id = id; }
+
+	// ===== Key fields =====
+	private Student student;
+
+	@MapsId("student")
+	@JoinColumn(name="student", referencedColumnName="id")
+	@ManyToOne
+	public Student getStudent () { return student; }
+	public void setStudent(Student student) { this.student = student; }
+
+	private Exam exam;
+
+	@MapsId("exam")
+	// il join tra Registration e Exam va fatto su due campi contemporaneamente:
+	// exam_result.course = exam.course AND exam_result.date = exam.date
+	@JoinColumns({
+			@JoinColumn(name="course", referencedColumnName="course"),
+			@JoinColumn(name="date", referencedColumnName="date")
+	})
+	@ManyToOne
+	public Exam getExam() { return this.exam; }
+	public void setExam(Exam exam) { this.exam = exam; }
+
+	// ===== Additional fields =====
+	private Integer grade;
+	@Column(name = "grade")
+	public Integer getGrade() { return grade; }
+	public void setGrade(Integer grade) { this.grade = grade; }
+}
+\end{lstlisting}
+Exam class implementations is similar to Registration implementation. We showed this to show an example of use of an embedded reference inside an embedded class.
 
 \addcontentsline{toc}{chapter}{Key-Value Feasibility Study}
 \chapter*{Key-Value Feasibility Study}
