@@ -21,7 +21,7 @@
 		\includegraphics[width=0.5\textwidth]{unipi.png}\par\vspace{1cm}
 		{\scshape\LARGE Department of Information Engineering \par}
 		\vspace{1cm}
-		{\huge\bfseries Information Systems \par Task 0 Documentation  \par}
+		{\huge\bfseries Information Systems \par Task 1 Documentation  \par}
 		\vspace{2cm}
 		\vfill
 		{\Large\scshape Students: \par 
@@ -52,7 +52,7 @@ The goal of the application that we implemented is to provide a way for both stu
 		\item Create a new exam date
 	\end{enumerate} 
 \end{itemize}
-The application is realized using the Java language, with the JavaFX extension to manage a graphic interface. The back-end uses a MySQL database to store the information.
+%The application is realized using the Java language, with the JavaFX extension to manage a graphic interface. The back-end uses a MySQL database to store the information.
 
 \addcontentsline{toc}{chapter}{Requirements and Use Cases}
 \chapter*{Requirements and Use Cases}
@@ -79,7 +79,7 @@ The Student:
 \addcontentsline{toc}{section}{Non-Functional Requirements}
 \section*{Non-Functional Requirements}
 For the application we identified Consistency and Availability as the two most important non-functional requirements.
-Both the requirements can be satisfied by the use of a RDBMS, since for our application we don't manage high volumes of data. For this reason we employed a MySQL DBMS to implement our back-end
+%Both the requirements can be satisfied by the use of a RDBMS, since for our application we don't manage high volumes of data. For this reason we employed a MySQL DBMS to implement our back-end
 \newpage
 \addcontentsline{toc}{section}{Use Case Diagram}
 \section*{Use Case Diagram}
@@ -187,6 +187,37 @@ Here we define in detail the terms for the main entites and relationships we wil
 	\caption{MySQL Schema}
 \end{figure}
 
+
+\addcontentsline{toc}{chapter}{Key-Value Feasibility Study}
+\chapter*{Key-Value Feasibility Study}
+The first version of the application stores all its data in a relational database managed by the MySQL RDBMS.
+The main non-functional requirements are availability and consistency ad they are both guaranteed by the relational database since the application handles a limited amount of data.
+Availability may be nomore guaranteed if the number of users grows large, i.e. the number of students. The system may responds slower when too many users are active at the same time since in this scenario the relational database has to perform a lot of complex operations to fullfill their demands resulting in not negligible waiting times. \linebreak
+Operations that work with exam registrations are the most expensive and time consuming as they require to perform a join on multiple tables of the database. Reducing this kind operations may be a possible solution to improve the system performance: it may be convenient to use a key-value database in parallel with the relational one and spread different operations between them. \linebreak
+
+The relational database still stores all the business data and the key-value database stores only data relative to registrations. The two copies registrations data make the storage system redundant but consistency is always guaranteed by the fact that write operations are committed on both the databases or canceled.
+When a write operation occurs both the databases update consistently their data and if one of two can not commit the update the other rollbacks and it is so possible to perform a write operation if and only if both databases are on.
+If a read operation regards single-table data it is redirected towards the relational database, if instead it regards registrations it is redirected towards the key-value database. In the latter case it may happen that the key-value database is anavailable, in this case the read operation is redirected towards the relational database. \linebreak 
+
+The key is composed of:
+\begin{itemize}
+	\item id of the course of the exam;
+	\item date of the exam;
+	\item id of the professor of the course;
+	\item id of the student.
+\end{itemize}
+The values, stored separetly, are:
+\begin{itemize}
+	\item name of the student;
+	\item surname of the student;
+	\item name of the professor;
+	\item surname of the professor;
+	\item name of the course;
+	\item number of CFU of the course;
+	\item grade assigned by the professor.
+\end{itemize}
+
+A key-value database is so used to take advantage of its semplicity and velocity to speedup read operations on regitrations data.
 
 \addcontentsline{toc}{chapter}{User's Manual}
 \chapter*{User's Manual}
