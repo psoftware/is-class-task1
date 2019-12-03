@@ -228,7 +228,11 @@ public class LevelDBManager {
     }
 
     public void clearAll() {
-        // TODO: not working, the first entry remains always
+        // Important issue: this leveldb implementation does not have methods to clear all the database values.
+        // Manual clearing does not work for the first key-value element, and THERE IS NO WAY TO DELETE IT.
+        // So, to avoid storing old references of key-value, we put now a dummy key-value pair that will be always
+        // the first
+        addDummyEntry("aa-dummy");
         db.forEach(entry -> db.delete(entry.getKey()));
     }
 
