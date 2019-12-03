@@ -58,14 +58,6 @@ public class LevelDBManager {
         db.put(bytes(key), bytes(Integer.toString(value)));
     }
 
-    public void addStudent(Student student) throws LevelDBUnavailableException {
-        exceptionIfNotAvailable();
-
-        String studentPrefix = "student:" + student.getId() +":";
-        putKeyValue(studentPrefix + "name", student.getName());
-        putKeyValue(studentPrefix + "surname", student.getSurname());
-    }
-
     public String getRegistrationKey(Registration registration) {
         StringBuilder key = new StringBuilder("");
         // Format -> registration:courseId:date:profId:studentid:
@@ -80,7 +72,7 @@ public class LevelDBManager {
         exceptionIfNotAvailable();
 
         String key = getRegistrationKey(registration).toString();
-        System.out.println(key);
+        //System.out.println(key);
 
         putKeyValue(key + "studentname", registration.getStudent().getName());
         putKeyValue(key + "studentsurname", registration.getStudent().getSurname());
@@ -231,56 +223,8 @@ public class LevelDBManager {
         addRegistration(reg);
     }
 
-    public void addExam(Exam exam) throws LevelDBUnavailableException {
-        exceptionIfNotAvailable();
-
-        StringBuilder key = new StringBuilder("");
-        // Format -> exam:courseid:date:
-        key.append("exam:")
-                .append(exam.getCourse().getId()).append(":")
-                .append(exam.getDate()).append(":");
-
-        putKeyValue(key.toString(), "");
-    }
-
-    public Student getStudent(int studentId) throws LevelDBUnavailableException {
-        exceptionIfNotAvailable();
-
-        Student student = new Student();
-        student.setId(studentId);
-
-        DBIterator keyIterator = db.iterator();
-        keyIterator.seek(bytes("student:" + studentId)); // moves the iterator to the keys starting with "employee"
-
-        try {
-            while (keyIterator.hasNext()) {
-
-                String key = asString(keyIterator.peekNext().getKey()); // key arrangement : employee:$employee_id:$attribute_name = $value
-                String[] keySplit = key.split(":"); // split the key
-
-                int parsedId = Integer.parseInt(keySplit[1]);
-                if(parsedId != studentId || !keySplit[0].equals("student"))
-                    break;
-
-                String lastAttribute = keySplit[keySplit.length - 1];
-                String storedValue = asString(db.get(bytes(key)));
-
-                if(lastAttribute.equals("name"))
-                    student.setName(storedValue);
-                else if(lastAttribute.equals("surname"))
-                    student.setSurname(storedValue);
-
-                keyIterator.next();
-            }
-        } finally {
-            try {
-                keyIterator.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return student;
+    private void addDummyEntry(String prefix) {
+        putKeyValue(prefix + ":valuename", "value");
     }
 
     public void clearAll() {
@@ -311,27 +255,17 @@ public class LevelDBManager {
     public static void test() throws LevelDBUnavailableException {
         LevelDBManager dbman = LevelDBManager.getInstance();
 
-        System.out.println("-> Test 1: adding registrations");
-
+        System.out.println("-> Test 0: clearing db");
         // Clear db
+        dbman.dumpAll();
         dbman.clearAll();
         dbman.dumpAll();
 
-        // Test Add Student
-        Student stud = new Student(1, "ciao", "arrivederci");
-        dbman.addStudent(stud);
-        stud = new Student(2, "ciao2", "arrivederci2");
-        dbman.addStudent(stud);
-        stud = new Student(3, "ciao3", "arrivederci3");
-        dbman.addStudent(stud);
-
-        // Test Add Exam
+        // Test Add Registrations
+        System.out.println("-> Test 1: adding registrations");
         Professor professor = new Professor(1, "Professore1", "Professore1Cognome");
         Course c = new Course(1, "Corso brutto", -10, professor);
         Exam e = new Exam(c, Date.valueOf("2019-7-7"));
-        dbman.addExam(e);
-
-        // Test Add Exam
         Student student = new Student(1,"Antonio", "Le Caldare");
         Registration reg = new Registration(student, e, 10);
         dbman.addRegistration(reg);
@@ -381,9 +315,6 @@ public class LevelDBManager {
         dbman.deleteRegistration(10, e);
         for(Registration r : dbman.findRegistrations())
             System.out.println(r.toString());
-
-        //stud = dbman.getStudent(2);
-        //System.out.println(stud.getName() + " " + stud.getSurname());
     }
 
     public static void main(String[] args) throws SQLException, LevelDBUnavailableException {
