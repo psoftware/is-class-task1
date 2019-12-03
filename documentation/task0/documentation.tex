@@ -15,8 +15,12 @@
 }
 \usepackage{array}
 \usepackage{listings}
+\usepackage{xcolor}
+\definecolor{mygray}{rgb}{0.9,0.9,0.9}
 \lstset{
-	tabsize=3
+	tabsize=3,
+	basicstyle={\small\ttfamily},
+	backgroundcolor=\color{mygray}
 }
 
 \begin{document}
@@ -195,6 +199,7 @@ Here we define in detail the terms for the main entites and relationships we wil
 \addcontentsline{toc}{chapter}{Implementation}
 \chapter*{Implementation}
 Project implementation is based on two main packages, \textit{task.db} and \textit{task.gui}, and database class objects implementation.
+\addcontentsline{toc}{section}{task.db package}
 \section*{task.db package}
 This package includes only one class, \textit{DBManager}, which is based on Singleton design pattern. Each method implements a CRUD operation on MySQL database using jpa api methods. A list of all the methods:
 \begin{itemize}
@@ -254,10 +259,15 @@ public List<Exam> findExam(int studId) {
 }
 \end{lstlisting}
 
+\subsection*{UML Class Diagram}
+
+
+\addcontentsline{toc}{section}{task.gui package}
 \section*{task.gui package}
 Includes classes related to gui implementation, implemented using JavaFX API.
 
-\section*{Database object files}
+\addcontentsline{toc}{section}{Database object classes}
+\section*{Database object classes}
 Database objects implementation derived from Task0 have been converted to a JPA implementation. Although this phase should have been a simple annotation task, it caused some issues with composite keys implementation. JPA requires that each composite key should be implemented as an @Embeddable class and instanced into the main object class with a @EmbeddedID reference (check tutorial for more details). In addition to this, each composite key member should have a duplicated reference inside the main class, annotated with @MapsID, which realizes the relation of composite key members. Also, JPA specification requires that each entity class must implement a costructor with no parameters. We choosed also to use every annotation on getter and setter methods instead of entity class members, although it does not make any difference, apart from be able to intercept every get and set operation made by JPA, which in any case we don't use. Student and Professor implementation is straighforward.
 
 \subsection*{Student}
@@ -382,6 +392,8 @@ public class Registration {
 \end{lstlisting}
 Exam class implementations is similar to Registration implementation. We showed this to show an example of use of an embedded reference inside an embedded class.
 
+
+
 \addcontentsline{toc}{chapter}{Key-Value Feasibility Study}
 \chapter*{Key-Value Feasibility Study}
 The first version of the application stores all its data in a relational database managed by the MySQL RDBMS.
@@ -393,25 +405,187 @@ The relational database still stores all the business data and the key-value dat
 When a write operation occurs both the databases update consistently their data and if one of two can not commit the update the other rollbacks and it is so possible to perform a write operation if and only if both databases are on.
 If a read operation regards single-table data it is redirected towards the relational database, if instead it regards registrations it is redirected towards the key-value database. In the latter case it may happen that the key-value database is anavailable, in this case the read operation is redirected towards the relational database. \linebreak 
 
-The key is composed of:
+The key is composed concatenating:
 \begin{itemize}
+	\item a prefix, ``registration''
 	\item id of the course of the exam;
 	\item date of the exam;
 	\item id of the professor of the course;
 	\item id of the student.
+	\item value name
 \end{itemize}
-The values, stored separetly, are:
+The full form is \textbf{registration:courseId:date:profId:studentid:valuename}, where \textbf{valuename} can be one of this list:
 \begin{itemize}
-	\item name of the student;
-	\item surname of the student;
-	\item name of the professor;
-	\item surname of the professor;
-	\item name of the course;
-	\item number of CFU of the course;
-	\item grade assigned by the professor.
+	\item \textit{studentname}: name of the student;
+	\item \textit{studentsurname}: surname of the student;
+	\item \textit{professorname}: name of the professor;
+	\item \textit{professorsurname}: surname of the professor;
+	\item \textit{coursename}: name of the course;
+	\item \textit{coursecfu}: number of CFU of the course;
+	\item \textit{grade}: grade assigned by the professor. grade null value is mapped to \(-1\) (grade cannot be less than 0)
 \end{itemize}
+For each registration, this list of key-value is inserted into the database.
 
-A key-value database is so used to take advantage of its semplicity and velocity to speedup read operations on regitrations data.
+\paragraph{Registration LevelDB Entry Example:}
+Student Mario Rossi (id = 3) registered to exam with date 2018-08-08 of Programming course (6 cfu, id = 1) with a grade of 29. The course is held by prof. Francesco Bianchi (id = 2). The following key-value pairs (showed in form of \textit{key = value}) will be added to LevelDB database:
+\begin{lstlisting}
+registration:1:2018-08-08:2:3:coursecfu = 6
+registration:1:2018-08-08:2:3:coursename = Programming
+registration:1:2018-08-08:2:3:grade = 29
+registration:1:2018-08-08:2:3:professorname = Francesco
+registration:1:2018-08-08:2:3:professorsurname = Bianchi
+registration:1:2018-08-08:2:3:studentname = Mario
+registration:1:2018-08-08:2:3:studentsurname = Rossi
+\end{lstlisting}
+
+A key-value database is used to take advantage of its semplicity and velocity to speedup read operations on regitrations data.
+
+\addcontentsline{toc}{section}{Class Design and Implementation}
+\section*{Class Design and Implementation}
+\subsection*{LevelDBManager class}
+As we previously mentioned, LevelDB should support MySQL DB on registration queries. The first step is to design and implement a manager class, similar to DBManager, called \textit{LevelDBManager}, which must implement a subset of DBManager methods, in particular all methods related to registration handling:
+\begin{lstlisting}
+public void addRegistration(Registration registration);
+public void updateRegistration(Registration reg, @Nullable Integer grade);
+public void insertRegistration(Student student, Exam exam, @Nullable Integer grade);
+public List<Registration> findRegistrationProfessor(int professorId);
+public List<Registration> findRegistrationStudent(int studentId, boolean toDo);
+\end{lstlisting}
+Method implementations is not showed here due to code length.
+
+\addcontentsline{toc}{subsection}{Strict consistency implementation with Transactions}
+\subsection*{Strict consistency implementation with Transactions}
+To manage strict consistency, it is required that at least one of the two Manager classes has to implement transactions on registration methods. The common case is the following: a write operation is executed and SQL and LevelDB databases should both execute the operation. If SQL query execution is successful but it is not he same for LevelDB, then the SQL query should be reverted. The same is if LevelDB is successful but SQL is not. To speedup write operations, we can think to parallelize both writes and commit only when both are successful. Unluckily this is not a possible choice, because LevelDB does not implement any form of transaction. This means that the only way to mantain strict consistency on all the CRUD operations on registrations is to first perform the query on the SQL database, without committing, then to execute the query on LevelDB. If both the operations are successful, then commit on SQL database can be performed, otherwise it rollbacks. In pseudo-code:
+\begin{lstlisting}
+	function writeop() {
+		try {
+			DBManager.begin();		// start transaction
+			DBManager.writeop(); 	// perform on SQL database first
+			LevelDB.writeop();		// performed always after SQL query
+			DBManager.commit();		// if we are here both query are correct
+		} catch {
+			DBManager.rollback(); // rollback on all exceptions
+		}
+	}
+\end{lstlisting}
+
+\addcontentsline{toc}{subsubsection}{Transaction on DBManager (SQL)}
+\subsubsection{Transaction on DBManager (SQL)}
+All registration write methods (update, insert and delete) must implement transactions. As we are using JPA, the only choice is to use JTA (Java Transactions API). For each operation we must:
+\begin{enumerate}
+	\item Create a new entityManager from entityFactory
+	\item Start a transaction using JTA
+	\item Perform all the operations
+	\item Commit or Rollback using JTA
+	\item Close the entityManager
+\end{enumerate}
+Also, we want to let external classes to be able to manage transactions, so this means that we must add some public methods for begin, commit and rollback operation on current transaction and not use this methods in DBManager methods themself. Follows our implementation:
+\begin{lstlisting}
+public class DBManager {
+	[...]
+	private EntityManager entityManager;
+	public void startTransaction() {
+		entityManager = factory.createEntityManager();
+		entityManager.getTransaction().begin();
+	}
+
+	public void commitTransaction() {
+		entityManager.getTransaction().commit();
+		entityManager.close();
+	}
+
+	public void rollbackTransaction() {
+		entityManager.getTransaction().rollback();
+		entityManager.close();
+	}
+
+	public void flushTransaction() {
+		entityManager.flush();
+	}
+\end{lstlisting}
+As we can see, entityManager lifecycle management is now a responsibility of the external class which performs any call on DBManager methods. The entityManager is created for each startTransaction() call and closed on rollback and commit.
+At this point, any external class can use and define transactions for DBManager methods.
+
+\addcontentsline{toc}{subsubsection}{JTA and Trigger Errors}
+\subsubsection{JTA and Trigger Errors}
+An issue occurred during testing of triggers on our JPA/JTA implementation: using the previous pseudo-code, as it is, it can cause to break strict consistency due to the fact that the effective query execution happens on commit() instead of the writeop() itself, leading to unwanted finalized writes on LevelDB database. To solve this, we must add a flush() call after calling DBManager write methods, forcing to execute all the queued queries. The new pseudo-code is this:
+\begin{lstlisting}
+	function writeop() {
+		try {
+			DBManager.begin();		// start transaction
+			DBManager.writeop(); 	// perform on SQL database first
+			DBManager.flush();		// <== FLUSH TO GET ANY TRIGGER ERROR HERE
+			LevelDB.writeop();		// performed always after SQL query
+			DBManager.commit();		// if we are here both query are correct
+		} catch {
+			DBManager.rollback(); // rollback on all exceptions
+		}
+	}
+\end{lstlisting}
+
+
+\addcontentsline{toc}{subsubsection}{Orchestration with CompositeDBManager class}
+\subsubsection*{Orchestration with CompositeDBManager class}
+To better organize all the code related to the orchestration of LevelDBManager and DBManager class, we defined a new class, called CompositeDBManager, which implements the same public interface of DBManager and handles all the cases we just defined. This means that this class will be the connecting code entity between the GUI and the database layer, basically taking the role of DBManager class. All read operations, in addition to all write operations on entities different from \textit{registration} are simply passed to DBManager without any pre/post processing. For all the remaining operations, we use the last approach described with pseudo code. Let's show an example:
+\begin{lstlisting}
+public class CompositeDBManager {
+	[...]
+	public void updateRegistration(Registration reg, int grade)
+			throws SQLException, LevelDBUnavailableException,
+			InconsistentDatabaseException {
+		try {
+			mysqlDBMan.startTransaction();
+			lastExecutor = QueryExecutor.Both;
+			mysqlDBMan.updateRegistration(reg, grade);
+			mysqlDBMan.flushTransaction();
+			levelDBManager.updateRegistration(reg, grade);
+			mysqlDBMan.commitTransaction();
+		} catch (Exception e) {
+			mysqlDBMan.rollbackTransaction();
+			throw e;
+		} finally {
+			checkConsistency();
+		}
+	}
+}
+\end{lstlisting}
+We will se \textit{LevelDBUnavailableException}, \textit{InconsistentDatabaseException} and checkConsistency() in Testing section. \textit{lastExecutor} is a member variable used to display on GUI which is the executor for the last query (MySQL, LevelDB or both), so it's just used for debugging purposes.
+
+
+\addcontentsline{toc}{section}{Testing}
+\section*{Testing}
+Testing code is important here to check if strict consistency is correctly achieved after executing any type of database operation.
+
+\addcontentsline{toc}{subsection}{Testing methods}
+\subsection*{Testing methods}
+DBManager, LevelDBManager and CompositeDBManager all implements a main() method which perform a suite of tests. In particular, CompositeDBManager use this to try loading all the registration from MySQL database into LevelDB database, then tries to get them from LevelDB and check if the initial list and the obtained list are equals. This led to some implementation issues, due to the fact that Java does not provide a method to compare lists deeply. Also, not all of database object classes overrided equals() method, and this required to implement them all.
+
+\addcontentsline{toc}{subsection}{Strict consistency checks}
+\subsection*{Strict consistency checks}
+After each CompositeManagerDB call on registration write methods, we can perform the same consistency check we just defined: take registration list from database, take registration list from LevelDB and the compare them deeply. We expect that every write operation on registrations passes this check.
+\begin{lstlisting}
+boolean isConsistent() throws SQLException, LevelDBUnavailableException {
+    return listDeepEqual(DBManager.getInstance().findRegistrations(),
+    						LevelDBManager.getInstance().findRegistrations());
+}
+
+void checkConsistency() throws SQLException, InconsistentDatabaseException {
+    try {
+        if(!isConsistent())
+            throw new InconsistentDatabaseException(
+            	"LevelDB/MySQL database is inconsistent! This should not happen");
+    } catch (LevelDBUnavailableException e) {
+        System.out.println("Cannot check consistency: LevelDB is unavailable");
+    }
+}
+\end{lstlisting}
+An example of checkConsistency() call can be seen in previous code chunks.\\
+NOTE: this check cannot be used in deployment because is too performance heavy. We did not remove all checking calls just for debugging purporses and \textbf{they can be removed without affecting application functionalies}.
+
+\addcontentsline{toc}{subsection}{LevelDB Exception simulation}
+\subsection*{LevelDB Exception simulation}
+LevelDB operations can lead to exceptions, but they are not so simple to trigger when we want to test them. So, to solve the problem, we decided to ``simulate'' exceptions, triggering them at command. We defined a simple LevelDBUnavailableException, which triggers any time a method from leveldb sees that a specific member variable (LevelDBManager.isAvailable) is set to true. This member variable can be changed directly from the GUI.
+
 
 \addcontentsline{toc}{chapter}{User's Manual}
 \chapter*{User's Manual}
