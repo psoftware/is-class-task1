@@ -14,9 +14,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "student")
 public class Student {
-    int id;
-    String name;
-    String surname;
+    private int id;
+    private String name;
+    private String surname;
 
     public Student() {
 
