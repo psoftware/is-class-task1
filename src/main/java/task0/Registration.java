@@ -47,7 +47,6 @@ public class Registration {
             return student == regobj.getStudent() && exam.equals(regobj.getExam());
         }
 
-        //TODO: implement hashcode (is it really necessary?)
         @Override
         public int hashCode() {
             return super.hashCode();
@@ -77,7 +76,7 @@ public class Registration {
     // ===== Key fields =====
     private Student student;
 
-    @MapsId("student") // TODO: verificare correttezza
+    @MapsId("student")
     @JoinColumn(name="student", referencedColumnName="id")
     @ManyToOne
     public Student getStudent () {
@@ -89,7 +88,7 @@ public class Registration {
 
     private Exam exam;
 
-    @MapsId("exam") // TODO: verificare correttezza
+    @MapsId("exam")
     // il join tra Registration e Exam va fatto su due campi contemporaneamente:
     // exam_result.course = exam.course AND exam_result.date = exam.date
     @JoinColumns({
