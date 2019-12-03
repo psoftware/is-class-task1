@@ -6,10 +6,8 @@ import main.java.task0.db.LevelDBManager.*;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class CompositeDBManager {
     private static CompositeDBManager INSTANCE;
@@ -80,14 +78,14 @@ public class CompositeDBManager {
     public void updateRegistration(Registration reg, int grade)
             throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
         try {
-            mysqlDBMan.startTransaction();
+            DBManager.transactions().startTransaction();
             lastExecutor = QueryExecutor.Both;
-            mysqlDBMan.updateRegistration(reg, grade);
-            mysqlDBMan.flushTransaction();
+            DBManager.transactions().updateRegistration(reg, grade);
+            DBManager.transactions().flushTransaction();
             levelDBManager.updateRegistration(reg, grade);
-            mysqlDBMan.commitTransaction();
+            DBManager.transactions().commitTransaction();
         } catch (Exception e) {
-            mysqlDBMan.rollbackTransaction();
+            DBManager.transactions().rollbackTransaction();
             throw e;
         } finally {
             checkConsistency();
@@ -97,14 +95,14 @@ public class CompositeDBManager {
     public void deleteRegistration(int studentId, Exam exam)
             throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
         try {
-            mysqlDBMan.startTransaction();
+            DBManager.transactions().startTransaction();
             lastExecutor = QueryExecutor.Both;
-            mysqlDBMan.deleteRegistration(studentId, exam);
-            mysqlDBMan.flushTransaction();
+            DBManager.transactions().deleteRegistration(studentId, exam);
+            DBManager.transactions().flushTransaction();
             levelDBManager.deleteRegistration(studentId, exam);
-            mysqlDBMan.commitTransaction();
+            DBManager.transactions().commitTransaction();
         } catch (Exception e) {
-            mysqlDBMan.rollbackTransaction();
+            DBManager.transactions().rollbackTransaction();
             throw e;
         } finally {
             checkConsistency();
@@ -119,17 +117,17 @@ public class CompositeDBManager {
     public void insertRegistration(int studentId, Exam exam, @Nullable Integer grade)
             throws SQLException, LevelDBUnavailableException, InconsistentDatabaseException {
         try {
-            mysqlDBMan.startTransaction();
+            DBManager.transactions().startTransaction();
             lastExecutor = QueryExecutor.Both;
-            Student student = mysqlDBMan.findStudent(studentId);
+            Student student = DBManager.transactions().findStudent(studentId);
             if(student == null)
                 throw new IllegalStateException("No student result associated to Student ID");
-            mysqlDBMan.insertRegistration(studentId, exam, grade);
-            mysqlDBMan.flushTransaction();
+            DBManager.transactions().insertRegistration(studentId, exam, grade);
+            DBManager.transactions().flushTransaction();
             levelDBManager.insertRegistration(student, exam, grade);
-            mysqlDBMan.commitTransaction();
+            DBManager.transactions().commitTransaction();
         } catch (Exception e) {
-            mysqlDBMan.rollbackTransaction();
+            DBManager.transactions().rollbackTransaction();
             throw e;
         } finally {
             checkConsistency();
