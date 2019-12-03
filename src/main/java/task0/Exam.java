@@ -51,7 +51,6 @@ public class Exam {
             return getDate().equals(examobj.date) && course == examobj.getCourse();
         }
 
-        //TODO: implement hashcode (is it really necessary?)
         @Override
         public int hashCode() {
             return super.hashCode();
@@ -70,7 +69,7 @@ public class Exam {
     // ===== Chiave =====
     private Course course;
 
-    @MapsId("course") // TODO: verificare correttezza
+    @MapsId("course")
     @JoinColumn(name="course", referencedColumnName="id")
     @ManyToOne
     public Course getCourse() {
