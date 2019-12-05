@@ -70,7 +70,7 @@ The Professor:
 \begin{enumerate}
 	\item shall be able to insert an exam, associated with a course he holds, in a date of choice
 	\item shall not be able to inster an exam for a date precedent to the current date
-	\item shall be able to insert the corresponding grade for a student in his registration for that exam.
+	\item shall be able to insert the corresponding grade for a student in their registration for that exam.
 	\item shall insert all grades in the exact date of the exam
 \end{enumerate}
 The Student:
@@ -79,7 +79,7 @@ The Student:
 	\item shall be able to register to an exam not yet took
 	\item shall not be able to register to an exam after the exam date.
 	\item shall be able to register to more successive exams for the same course
-	\item If the student registered to successive exams for the same course he just got a mark for, then those future registrations shall be deleted
+	\item If the student registered to successive exams for the same course he just got a mark for, then those future registrations shall be hidden
 	\item shall be able to deregister from an exam he was previously registered to
 	\item shall not be able to deregister from an exam alredy took
 	\item shall not be able to deregister from an exam after the exam date.
@@ -637,11 +637,11 @@ We will see \textit{LevelDBUnavailableException}, \textit{InconsistentDatabaseEx
 
 \addcontentsline{toc}{section}{Testing}
 \section*{Testing}
-Testing code is important here to check if strict consistency is correctly achieved after executing any type of database operation.
+Testing code is important here to check if \textbf{strict consistency is correctly achieved} after executing any type of database operation.
 
 \addcontentsline{toc}{subsection}{Testing methods}
 \subsection*{Testing methods}
-DBManager, LevelDBManager and CompositeDBManager all implements a main() method which perform a suite of tests. In particular, CompositeDBManager use this to try loading all the registration from MySQL database into LevelDB database, then tries to get them from LevelDB and check if the initial list and the obtained list are equals. This led to some implementation issues, due to the fact that Java does not provide a method to compare lists deeply. Also, not all of database object classes overrided equals() method, and this required to implement them all.
+DBManager, LevelDBManager and CompositeDBManager all implements a main() method which perform a \textbf{suite of tests}. In particular, CompositeDBManager tries to load all the registrations from MySQL database into LevelDB database, then tries to get them from LevelDB and check if the initial list and the obtained list are equals. This led to some implementation issues, due to the fact that Java does not provide a method to \textbf{compare lists deeply}. Also, not all of database object classes overrode equals() method, and this required to implement them all.
 
 \addcontentsline{toc}{subsection}{Strict consistency checks}
 \subsection*{Strict consistency checks}
@@ -667,7 +667,9 @@ NOTE: this check cannot be used in deployment because is too performance heavy. 
 
 \addcontentsline{toc}{subsection}{LevelDB Exception simulation}
 \subsection*{LevelDB Exception simulation}
-LevelDB operations can lead to exceptions, but they are not so simple to trigger when we want to test them. So, to solve the problem, we decided to ``simulate'' exceptions, triggering them at command. We defined a simple LevelDBUnavailableException, which triggers any time a method from leveldb sees that a specific member variable (LevelDBManager.isAvailable) is set to true. This member variable can be changed directly from the GUI.
+LevelDB operations can lead to \textbf{exceptions}, but they are not so simple to trigger when we want to test them. To solve the problem, we decided to ``simulate'' exceptions, triggering them at command.\\
+We defined a simple \textbf{LevelDBUnavailableException} class, which triggers the exception any time a method from leveldb sees that the member variable \textbf{LevelDBManager.isAvailable }is set to \textbf{true}.\\
+This member variable can be changed directly from the GUI.
 
 
 \addcontentsline{toc}{chapter}{User's Manual}
@@ -817,5 +819,43 @@ If the Student select the \textit{See Grades} option, the table, fig. \ref{fig:S
 	\item \textit{Date}, the date when the student passed the exam;
 	\item \textit{Grade}, the grade the Student got. 
 \end{itemize}
+
+\newpage
+\section*{LevelDB Handling Example}
+The introduction of the LevelDB Key-Value Database required the \textbf{addition of an element} to the GUI. This addition consist of a \textbf{button} at the bottom of the application window, from which the user is able to \textbf{enable or disable} the functionalities provided by LevelDB.\\ 
+In particular, since the application is built on a\textbf{ Strict Consistency} requirement, this button's purpose is to \textbf{simulate a malfunctioning} in LevelDB, which makes impossible to write on it. For this reason, all the operations that require to write something cannot be performed, or the\textbf{ Consistency would be lost.}
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{LevelDBAvailable.png}
+	\caption{Enabling LevelDB support }
+	\label{fig:LevelDBAvailable}
+\end{figure}
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{LevelDBNotAvailable.png}
+	\caption{Disabling LevelDB support}
+	\label{fig:LevelDBNotAvailable}
+\end{figure}
+
+In order to show how this procedure works, we will go through one of the previous use cases, but this time disabling the LevelDB support. We will choose a use case that involves writing on Registrations, in particular the \textbf{Student - Register to Exam}
+\subsection*{Student - Register to Exam}
+If the Student selects the \textit{Register to Exam} option, the table is populated with a list of all exams the student can register to, as shown in fig \ref{fig:RegisterToExamNotAvailable}.\\
+After pressing the \textit{Confirm} button, we will disable the LevelDB support, selecting the option \textit{Not Available} from the dropdown menu at the bottom of the window, as shown in fig. \ref{fig:LevelDBNotAvailable}.
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{RegisterToExamNotAvailable.png}
+	\caption{Example of Register to Exam without LevelDB support}
+	\label{fig:RegisterToExamNotAvailable}
+\end{figure}
+If then we try to press the \textit{Register} button on the second row of the table, the registration will abort, showing a dialog box with an error message, as in fig. \ref{fig:LevelDBErrorDialog}
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.6\textwidth]{LevelDBErrorDialog.png}
+	\caption{Example of Register to Exam without LevelDB support}
+	\label{fig:LevelDBErrorDialog}
+\end{figure}
+
+
+
 
 \end{document}
