@@ -226,6 +226,34 @@ This package includes only one class, \textit{DBManager}, which is based on Sing
 	\item public void deleteRegistration(int studentId, Exam exam); \newline delete registration given its key (composite key of studentid + exam)
 \end{itemize}
 
+\subsection*{Using of EntityManager and EntityFactoryManager}
+\begin{lstlisting}
+public class DBManager {
+	private static DBManager INSTANCE = new DBManager();
+	public static DBManager getInstance() {
+		return INSTANCE;
+	}
+
+	private EntityManagerFactory factory;
+
+	public DBManager() {
+		setup();
+	}
+
+	public void setup() {
+		factory = Persistence.createEntityManagerFactory("Task0");
+	}
+
+	public void exit() {
+		factory.close();
+	}
+
+	[...]
+}
+\end{lstlisting}
+As we can see, \textit{entityFactory} is only created at setup time (in \textit{setup()}, called by constructor) and closed when the applications get closed (through calling \textit{close()}). In the next code snippets it's showed how \textit{entityManager}, instead, is created from \textit{entityFactory} and closed, respectively, at start and the end of each method that implements CRUD operations on database.
+\\
+
 \subsection*{Implementation of findRegistrationStudent(int studentId, boolean toDo)}
 This implementation and the following one use JPQL language instead of SQL.
 \begin{lstlisting}
