@@ -195,10 +195,23 @@ Here we define in detail the terms for the main entites and relationships we wil
 	\caption{MySQL Schema}
 \end{figure}
 
+\addcontentsline{toc}{section}{Design and Implementation of Java Application (with JPA)}
+\section*{Design and Implementation of Java Application (with JPA)}
+\begin{figure}[ht]
+	\includegraphics[width=1\textwidth]{Jpa_leveldb_Diagram.png}
+	\caption{MySQL Schema}
+\end{figure}
 
-\addcontentsline{toc}{chapter}{Implementation}
-\chapter*{Implementation}
-Project implementation is based on two main packages, \textit{task.db} and \textit{task.gui}, and database class objects implementation.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.6\textwidth]{jpa-DBPackage.png}
+	\caption{DBManager class design in task.db Package}
+\end{figure}
+
+
+%\addcontentsline{toc}{chapter}{Implementation}
+%\chapter*{Implementation}
+Project design and implementation is based on two main packages, \textit{task.db} and \textit{task.gui}, and database class objects implementation.
 \addcontentsline{toc}{section}{task.db package}
 \section*{task.db package}
 This package includes only one class, \textit{DBManager}, which is based on Singleton design pattern. Each method implements a CRUD operation on MySQL database using jpa api methods. A list of all the methods:
@@ -259,15 +272,12 @@ public List<Exam> findExam(int studId) {
 }
 \end{lstlisting}
 
-\subsection*{UML Class Diagram}
-
-
 \addcontentsline{toc}{section}{task.gui package}
 \section*{task.gui package}
 Includes classes related to gui implementation, implemented using JavaFX API.
 
-\addcontentsline{toc}{section}{Database object classes}
-\section*{Database object classes}
+\addcontentsline{toc}{section}{Database object classes Design and Implementation}
+\section*{Database object classes Design and Implementation}
 Database objects implementation derived from Task0 have been converted to a JPA implementation. Although this phase should have been a simple annotation task, it caused some issues with composite keys implementation. JPA requires that each composite key should be implemented as an @Embeddable class and instanced into the main object class with a @EmbeddedID reference (check tutorial for more details). In addition to this, each composite key member should have a duplicated reference inside the main class, annotated with @MapsID, which realizes the relation of composite key members. Also, JPA specification requires that each entity class must implement a costructor with no parameters. We choosed also to use every annotation on getter and setter methods instead of entity class members, although it does not make any difference, apart from be able to intercept every get and set operation made by JPA, which in any case we don't use. Student and Professor implementation is straighforward.
 
 \subsection*{Student}
@@ -469,46 +479,81 @@ To manage strict consistency, it is required that at least one of the two Manage
 	}
 \end{lstlisting}
 
-\addcontentsline{toc}{subsubsection}{Transaction on DBManager (SQL)}
-\subsubsection{Transaction on DBManager (SQL)}
-All registration write methods (update, insert and delete) must implement transactions. As we are using JPA, the only choice is to use JTA (Java Transactions API). For each operation we must:
+\addcontentsline{toc}{subsubsection}{Transactions on DBManager (SQL)}
+\subsubsection{Transactions implementation in DBManager (SQL)}
+All registration write methods (update, insert and delete) must implement transactions. As we are using JPA with resource-local entityManager(s), the only choice is to use EntityTransaction class methods. For each operation we must:
 \begin{enumerate}
 	\item Create a new entityManager from entityFactory
-	\item Start a transaction using JTA
+	\item Get a EntityTransaction instance from entityManager
+	\item Start a transaction (using EntityTransaction)
 	\item Perform all the operations
-	\item Commit or Rollback using JTA
+	\item Commit or Rollback transaction (using EntityTransaction)
 	\item Close the entityManager
 \end{enumerate}
-Also, we want to let external classes to be able to manage transactions, so this means that we must add some public methods for begin, commit and rollback operation on current transaction and not use this methods in DBManager methods themself. Follows our implementation:
+Also, we want to let external classes to be able to manage transactions, so this means that we must add some public methods for begin, commit and rollback operation on current transaction and not use this methods in DBManager methods themself. In this case, entityManager persists over multiple method calls, so it must be defined as a member of DBManager. However we don't want to mix previously defined methods for exam, student, professor and so on, with those new implementation of registration methods, due to the fact that in the previous ones, entityManager gets created and closed in each single method. So, to differentiate this two subsets, we implemented an additional Transactions class, which is an inner class of DBManager. This class has a member entityManager and can access entityManagerFactory of the outer class.
+
+
+\begin{figure} [h!]
+	\centering
+	\includegraphics[width=0.5\textwidth]{TransactionsClassDia.png}
+	\caption{Transactions Class Diagram}
+	\label{fig:transactions-dia}
+\end{figure}
+
+Follows our implementation of Transaction Class with just one database method for registrations:
 \begin{lstlisting}
 public class DBManager {
-	[...]
-	private EntityManager entityManager;
-	public void startTransaction() {
-		entityManager = factory.createEntityManager();
-		entityManager.getTransaction().begin();
+	private EntityManagerFactory factory;
+
+	public class Transactions {
+		[...]
+		private EntityManager entityManager;
+		public void startTransaction() {
+			entityManager = factory.createEntityManager();
+			entityManager.getTransaction().begin();
+		}
+
+		public void commitTransaction() {
+			entityManager.getTransaction().commit();
+			entityManager.close();
+		}
+
+		public void rollbackTransaction() {
+			entityManager.getTransaction().rollback();
+			entityManager.close();
+		}
+
+		public void flushTransaction() {
+			entityManager.flush();
+		}
+
+		public void deleteRegistration(int studentId, Exam exam) {
+			try {
+				Query query = entityManager
+					.createQuery("DELETE FROM Registration r WHERE "+
+					" r.exam = :exam AND r.student.id = :studId");
+				query.setParameter("exam", exam);
+				query.setParameter("studId", studentId);
+				query.executeUpdate();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				System.out.println("Exception on delete registration!");
+				throw ex;
+			}
+		}
+
+		[.. Other Methods to use WITH transactions ..]
 	}
 
-	public void commitTransaction() {
-		entityManager.getTransaction().commit();
-		entityManager.close();
-	}
-
-	public void rollbackTransaction() {
-		entityManager.getTransaction().rollback();
-		entityManager.close();
-	}
-
-	public void flushTransaction() {
-		entityManager.flush();
-	}
+	[.. Methods to use WITHOUT transactions ..]
+}
 \end{lstlisting}
 As we can see, entityManager lifecycle management is now a responsibility of the external class which performs any call on DBManager methods. The entityManager is created for each startTransaction() call and closed on rollback and commit.
-At this point, any external class can use and define transactions for DBManager methods.
+At this point, any external class can use and define transactions for DBManager.Transactions methods.
 
-\addcontentsline{toc}{subsubsection}{JTA and Trigger Errors}
-\subsubsection{JTA and Trigger Errors}
-An issue occurred during testing of triggers on our JPA/JTA implementation: using the previous pseudo-code, as it is, it can cause to break strict consistency due to the fact that the effective query execution happens on commit() instead of the writeop() itself, leading to unwanted finalized writes on LevelDB database. To solve this, we must add a flush() call after calling DBManager write methods, forcing to execute all the queued queries. The new pseudo-code is this:
+\addcontentsline{toc}{subsubsection}{EntityTransactions and Trigger Errors}
+\subsubsection{JPA and Trigger Error management}
+An issue occurred during testing of triggers on our JPA implementation: using the previous pseudo-code, as it is, it can cause to break strict consistency due to the fact that the effective query execution happens on commit() instead of the writeop() itself, leading to unwanted finalized writes on LevelDB database. To solve this, we must add a flush() call after calling DBManager write methods, forcing to execute all the queued queries. The new pseudo-code is this:
 \begin{lstlisting}
 	function writeop() {
 		try {
@@ -534,14 +579,14 @@ public class CompositeDBManager {
 			throws SQLException, LevelDBUnavailableException,
 			InconsistentDatabaseException {
 		try {
-			mysqlDBMan.startTransaction();
+			DBManager.transactions().startTransaction();
 			lastExecutor = QueryExecutor.Both;
-			mysqlDBMan.updateRegistration(reg, grade);
-			mysqlDBMan.flushTransaction();
+			DBManager.transactions().updateRegistration(reg, grade);
+			DBManager.transactions().flushTransaction();
 			levelDBManager.updateRegistration(reg, grade);
-			mysqlDBMan.commitTransaction();
+			DBManager.transactions().commitTransaction();
 		} catch (Exception e) {
-			mysqlDBMan.rollbackTransaction();
+			DBManager.transactions().rollbackTransaction();
 			throw e;
 		} finally {
 			checkConsistency();
@@ -549,7 +594,17 @@ public class CompositeDBManager {
 	}
 }
 \end{lstlisting}
-We will se \textit{LevelDBUnavailableException}, \textit{InconsistentDatabaseException} and checkConsistency() in Testing section. \textit{lastExecutor} is a member variable used to display on GUI which is the executor for the last query (MySQL, LevelDB or both), so it's just used for debugging purposes.
+We will see \textit{LevelDBUnavailableException}, \textit{InconsistentDatabaseException} and checkConsistency() in Testing section. \textit{lastExecutor} is a member variable used to display on GUI which is the executor for the last query (MySQL, LevelDB or both), so it's just used for debugging purposes.
+
+\newpage
+\addcontentsline{toc}{subsection}{UML Class Diagram for task.db package}
+\subsection*{UML Class Diagram for task.db package}
+\begin{figure} [!ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{jpaLevelDB-DBPackage.png}
+	\caption{UML Class Diagram for task.db package}
+	\label{fig:leveldb-classdia}
+\end{figure}
 
 
 \addcontentsline{toc}{section}{Testing}
@@ -565,18 +620,18 @@ DBManager, LevelDBManager and CompositeDBManager all implements a main() method 
 After each CompositeManagerDB call on registration write methods, we can perform the same consistency check we just defined: take registration list from database, take registration list from LevelDB and the compare them deeply. We expect that every write operation on registrations passes this check.
 \begin{lstlisting}
 boolean isConsistent() throws SQLException, LevelDBUnavailableException {
-    return listDeepEqual(DBManager.getInstance().findRegistrations(),
-    						LevelDBManager.getInstance().findRegistrations());
+	return listDeepEqual(DBManager.getInstance().findRegistrations(),
+							LevelDBManager.getInstance().findRegistrations());
 }
 
 void checkConsistency() throws SQLException, InconsistentDatabaseException {
-    try {
-        if(!isConsistent())
-            throw new InconsistentDatabaseException(
-            	"LevelDB/MySQL database is inconsistent! This should not happen");
-    } catch (LevelDBUnavailableException e) {
-        System.out.println("Cannot check consistency: LevelDB is unavailable");
-    }
+	try {
+		if(!isConsistent())
+			throw new InconsistentDatabaseException(
+				"LevelDB/MySQL database is inconsistent! This should not happen");
+	} catch (LevelDBUnavailableException e) {
+		System.out.println("Cannot check consistency: LevelDB is unavailable");
+	}
 }
 \end{lstlisting}
 An example of checkConsistency() call can be seen in previous code chunks.\\
