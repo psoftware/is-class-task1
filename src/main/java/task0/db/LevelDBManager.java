@@ -88,7 +88,21 @@ public class LevelDBManager {
     }
 
     public ArrayList<Registration> findRegistrationStudent(int studentId, boolean toDo) throws LevelDBUnavailableException {
-        return findRegistrations(reg -> reg.getStudent().getId() == studentId && ((toDo)?reg.getGrade()==null : reg.getGrade()!=null));
+        if(!toDo)
+            return findRegistrations(reg -> reg.getStudent().getId() == studentId && reg.getGrade() != null);
+
+        // Get all registrations which course does not have registrations with grades
+        ArrayList<Registration> tempRegs = findRegistrations(reg -> reg.getStudent().getId() == studentId);
+        HashSet<Integer> completedCourses = new HashSet<>();
+        for(Registration r : tempRegs)
+            if(r.getGrade() != null)
+                completedCourses.add(r.getExam().getCourse().getId());
+
+        ArrayList<Registration> result = new ArrayList<>();
+        for(Registration r : tempRegs)
+            if(r.getGrade() == null  && !completedCourses.contains(r.getExam().getCourse().getId()))
+                result.add(r);
+        return result;
     }
 
     // add registration to registration list only if filters returns true
