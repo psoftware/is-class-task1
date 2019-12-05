@@ -266,6 +266,7 @@ public void insertRegistration(int studentId, Exam examDetached, @Nullable Integ
 	entityManager.persist(registration);
 	entityManager.getTransaction().commit();
 	/***/
+	entityManager.close()
 }
 \end{lstlisting}
 \end{frame}
