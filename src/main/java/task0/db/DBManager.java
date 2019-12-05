@@ -119,8 +119,14 @@ public class DBManager {
         List<Registration> resultList;
         try {
             entityManager = factory.createEntityManager();
-            Query query = entityManager.createQuery("SELECT r FROM Registration r WHERE r.student.id = :studentId AND r.grade IS "
-                    + ((toDo) ? "NULL" : "NOT NULL"));
+            String sql = "SELECT r FROM Registration r WHERE r.student.id = :studentId AND r.grade IS ";
+            if(toDo)
+                sql += "NULL AND (" +
+                        "SELECT count(r1) FROM Registration r1 " +
+                            "WHERE r.student = r1.student AND r.exam.course = r1.exam.course and r1.grade IS NOT NULL) = 0";
+            else
+                sql += "NOT NULL";
+            Query query = entityManager.createQuery(sql);
             query.setParameter("studentId", studentId);
             resultList = query.getResultList();
         } catch (Exception ex) {
