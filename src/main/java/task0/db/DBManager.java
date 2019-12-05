@@ -134,7 +134,10 @@ public class DBManager {
                     "INNER JOIN professor pr ON pr.id = c.professor " +
                     "INNER JOIN exam ex ON (ex.course = c.id AND ex.date = e.date) ";
             if (toDo)
-                sql += "WHERE e.student = ? AND grade is NULL";
+                sql += " WHERE e.student = ? AND e.grade is NULL" +
+                        " AND NOT EXISTS(" +
+                        "SELECT * FROM exam_result e1 WHERE " +
+                        "e.student = e1.student AND e.course = e1.course AND grade is NOT NULL);";
             else
                 sql += "WHERE e.student = ? AND grade is not NULL";
 
