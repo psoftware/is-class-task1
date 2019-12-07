@@ -216,14 +216,14 @@ Project design and implementation is based on two main packages, \textit{task.db
 \section*{task.db package}
 This package includes only one class, \textit{DBManager}, which is based on Singleton design pattern. Each method implements a CRUD operation on MySQL database using jpa api methods. A list of all the methods:
 \begin{itemize}
-	\item public List\(<\)Course\(>\) findCourse(int profID); \newline find all courses given a professor ID
-	\item public List\(<\)Exam\(>\) findExam(int studId); \newline find all exams registered by a student indentified by its ID 
-	\item public List\(<\)Registration\(>\) findRegistrationProfessor(int profId); \newline find all registrations opened by professor identified by the parameter ID
-	\item public List\(<\)Registration\(>\) findRegistrationStudent(int studentId, boolean toDo); \newline find all registrations applied to student identified by student ID. If toDo is true, show only registrations without grade, otherwise return all registration with grade
-	\item public void insertExam(int courseID, LocalDate date); \newline add exam for specified courseID at specified date
-	\item public void insertRegistration(int studentId, Exam examDetached, @Nullable Integer grade); \newline insert registration for specified student and exam (can be detached from jpa context). grade can be null, in that case it means that a registration is inserted without a grade
-	\item public void updateRegistration(Registration reg, int grade); \newline update grade to a registration
-	\item public void deleteRegistration(int studentId, Exam exam); \newline delete registration given its key (composite key of studentid + exam)
+	\item \textit{public List\(<\)Course\(>\) findCourse(int profID);} \newline find all courses given a professor ID
+	\item \textit{public List\(<\)Exam\(>\) findExam(int studId);} \newline find all exams to which the student can register to 
+	\item \textit{public List\(<\)Registration\(>\) findRegistrationProfessor(int profId)}; \newline find all registrations submitted by students for exams held by the professor identified by the parameter ID
+	\item \textit{public List\(<\)Registration\(>\) findRegistrationStudent(int studentId, boolean toDo);} \newline find all registrations applied by the student identified by student ID. If toDo is true, show only registrations without grade, otherwise return all registration with grade
+	\item \textit{public void insertExam(int courseID, LocalDate date);} \newline add exam for specified courseID at specified date
+	\item \textit{public void insertRegistration(int studentId, Exam examDetached, @Nullable Integer grade);} \newline insert registration for specified student and exam (can be detached from jpa context). grade can be null, in that case it means that a registration is inserted without a grade
+	\item \textit{public void updateRegistration(Registration reg, int grade);} \newline update grade to a registration
+	\item \textit{public void deleteRegistration(int studentId, Exam exam);} \newline delete registration given its key (composite key of studentid + exam)
 \end{itemize}
 
 \subsection*{Using of EntityManager and EntityFactoryManager}
@@ -306,7 +306,10 @@ Includes classes related to gui implementation, implemented using JavaFX API.
 
 \addcontentsline{toc}{section}{Database object classes Design and Implementation}
 \section*{Database object classes Design and Implementation}
-Database objects implementation derived from Task0 have been converted to a JPA implementation. Although this phase should have been a simple annotation task, it caused some issues with composite keys implementation. JPA requires that each composite key should be implemented as an @Embeddable class and instanced into the main object class with a @EmbeddedID reference (check tutorial for more details). In addition to this, each composite key member should have a duplicated reference inside the main class, annotated with @MapsID, which realizes the relation of composite key members. Also, JPA specification requires that each entity class must implement a costructor with no parameters. We choosed also to use every annotation on getter and setter methods instead of entity class members, although it does not make any difference, apart from be able to intercept every get and set operation made by JPA, which in any case we don't use. Student and Professor implementation is straighforward.
+Database objects implementation derived from Task0 have been converted to a JPA implementation. Although this phase should have been a simple annotation task, it caused some issues with \textbf{composite keys implementation}. 
+\newline
+JPA requires that each composite key should be implemented as an\textit{ @Embeddable} class and instanced into the main object class with a \textit{@EmbeddedID} reference (check tutorial for more details). In addition to this, each composite key member should have a \textbf{duplicated reference} inside the main class, annotated with \textit{@MapsID}, which realizes the relation of composite key members. \newline 
+Also, JPA specification requires that each entity class must implement a costructor with no parameters. We choosed also to use every\textbf{ annotation on getter and setter methods} instead of entity class members, although it does not make any difference, apart from be able to intercept every get and set operation made by JPA, which in any case we don't use. \textit{Student} and \textit{Professor} implementation is straighforward.
 
 \subsection*{Student}
 \begin{lstlisting}[language=Java]
@@ -339,7 +342,7 @@ public class Student {
 	public void setSurname(String surname) { this.surname = surname; }
 }
 \end{lstlisting}
-Professor implementation is similar to this.
+\textit{Professor} implementation is similar to this.
 
 
 \subsection*{Registration}
@@ -428,7 +431,7 @@ public class Registration {
 	public void setGrade(Integer grade) { this.grade = grade; }
 }
 \end{lstlisting}
-Exam class implementations is similar to Registration implementation. We showed this to show an example of use of an embedded reference inside an embedded class.
+\textit{Exam} class implementations is similar to \textit{Registration} implementation. We present this to show an example of usage of an \textbf{embedded reference inside an embedded class.}
 
 
 

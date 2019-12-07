@@ -46,7 +46,7 @@
 
 \begin{frame}
 \frametitle{What is and Why JPA}
-JPA (Java Persistence API) is a Java specification for ORM (Object Relational Mapping). The purpose of ORM is to map the concepts from ObjectOriented Programming with concepts of relational databases to let the programmer to focus on the business logic instead of the translation between the two worlds. Once the mapping is done it is possble to work with instances of classes that are directly mapped to rows of table without performing any transformation.
+JPA (Java Persistence API) is a Java specification for ORM (Object Relational Mapping). The purpose of ORM is to map the concepts from ObjectOriented Programming with concepts of relational databases to let the programmer focus on the business logic instead of the translation between the two worlds. Once the mapping is done it is possble to work with instances of classes that are directly mapped to rows of table without performing any transformation. \newline\newline
 In this tutorial we focus on Hibernate which is one of the implementation of the JPA specification. 
 \end{frame}
 
@@ -63,12 +63,63 @@ Mapping may be done using \textit{annotations} or \textit{persistence.xml} file 
 \begin{frame}
 \frametitle{Examples Definition}
 All the following examples come from the application developed in \textit{Task 1}. This application handles university exams creation, registration, deregistration and validation.
-For clarity the class-diagram is reported.
+The class-diagram is reported for clarity.
 \linebreak
 \begin{figure}
 \includegraphics[scale=0.45]{ClassDiagram.png}
 \centering
 \end{figure}
+\end{frame}
+
+\begin{frame} [fragile]
+\frametitle{\textit{persistence.xml} Example [1]}
+\begin{lstlisting}[language=xml, caption=persistence.xml example]
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" 
+xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation=
+		"http://xmlns.jcp.org/xml/ns/persistence
+		 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+ <persistence-unit name="Task0">
+  <properties>
+   <property name="javax.persistence.jdbc.url"
+	  value="jdbc:mysql://localhost:3306/Task0?
+	  useLegacyDatetimeCode=false&amp;
+	  serverTimezone=Europe/Rome" />
+\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+\frametitle{\textit{persistence.xml} Example [2]}
+\begin{lstlisting}[language=xml, caption=persistence.xml example]
+   <property name="javax.persistence.jdbc.user"
+   			 value="root" />
+   <property name="javax.persistence.jdbc.password"
+   			 value="root" />
+   <property name="javax.persistence.jdbc.driver"
+   			 value="com.mysql.cj.jdbc.Driver" />
+
+   <!-- value can be "validate" (do not alter db schema) or "update" (alter db schema) -->
+   <property name="hibernate.hbm2ddl.auto" value="validate"/>
+
+   <property name="hibernate.show_sql" value="true" />
+   <property name="hibernate.format_sql" value="true" />
+  </properties>
+ </persistence-unit>
+
+</persistence>
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+\frametitle{\textit{persistence.xml} Example [3]}
+The following tag specifies that JPA cannot modify the schema of the database.
+\begin{lstlisting}[language=xml, caption=persistence.xml example]
+<property name="hibernate.hbm2ddl.auto"
+		  		 value="validate"/>
+\end{lstlisting}
 \end{frame}
 
 \begin{frame} [fragile]
@@ -90,12 +141,11 @@ public class Professor {...}
 	\frametitle{JPA Annotations}
 	Annotation may be before a field or a method but not both. In the case the annotation is before the method
 	\begin{itemize}
-		\item \textit{@Id}, specifies the primary key for an entity. The class of the primary key shall implement \textit{Serializable} interface and the \textit{equal} and \textit{hash} methods.
+		\item \textit{@Id}, specifies the primary key for an entity. The class of the primary key shall implement \textit{Serializable} interface and the \textit{equal} and \textit{hash} methods, according to JPA specification.
 	\end{itemize}
 	\begin{lstlisting}[language=java, caption=@Id @Column and @GeneratedValue]
 		@Column(name = "id")
 		@Id
-		@GeneratedValue(strategy = GenerationType.IDENTITY)
 		public int getId() {
 		return id;
 		}
@@ -179,7 +229,7 @@ This is another example of foreign key: the attribute \textit{exam} of the \text
 \begin{frame} [fragile]
 \begin{itemize}
 \frametitle{JPA ANNOTATIONS}
-\item @ManyToMany, specifies a many-valued association with many-to-many multiplicity.  If for example we change our application and we suppose that more than one professor can teach a course we have a many to many relationship between the two entities. We suppose that the courses are more used in our application and therefore makes sense to set \textit{Course} entity as the \textit{owning side} using the \text{@JoinTable}: it specifies the name of the joining table and joining columns.
+\item @ManyToMany, specifies a many-valued association with many-to-many multiplicity.  If for example we change our application and we suppose that more than one professor can teach a course we have a many to many relationship between the two entities. We suppose that \textit{Course} entity as the \textit{owning side} using the \text{@JoinTable}: it specifies the name of the joining table and joining columns.
 \end{itemize}
 \end{frame}
 
@@ -190,14 +240,12 @@ This is another example of foreign key: the attribute \textit{exam} of the \text
 @Table(name="Professor")
 public class Professor {
 	/*
-	 *
 	 */
 	 private Collection<Course> courses = new Collection<>();
 	 @ManyToMany(mappedBy=professors)
 	 //mappedBy indicates the attribute in the owning side
 	 public Collection<Course> getCourses(){ return courses; }
 	 /*
-	  *
 	  */
 }
 \end{lstlisting}
@@ -210,7 +258,6 @@ public class Professor {
 @Table(name="Course")
 public class Course {
 	/*
-	 *
 	 */
 	 private Collection<Professor> professors = new Collection<>();
 	 @ManyToMany
@@ -221,7 +268,6 @@ public class Course {
 	 }
 	 public Collection<Professor> getProfessors() { return professors; }
 	 /*
-	  *
 	  */
 }
 \end{lstlisting}
